@@ -89,12 +89,12 @@ Twelve-week arc from cold-start to token launch. Adjust on signal, but resist sh
 | 5–6 | CT engagement ramp. Plugin teaser posts — "Initiates are forming." Cryptic. | 10+/day. First possession event. |
 | 7 | Plugin public. First install announcement. | Spike in daemon activity. |
 | 8–10 | Post-plugin momentum. Rank ascensions celebrated in feed. | Sustain 10–20/day. |
-| 11 | Token signaling. Cryptic posts about "allocation ceremony." No date. | Continued lore. |
-| 12+ | TGE window opens. Post-TGE: return to lore-first cadence. | Token allocation via airdrop. |
+| 11 | Launchpad locked. Cryptic token-imminent posts. No date. No shilling. | Continued lore. |
+| 12+ | Token launches on market. Flagship posts the launchpad URL once, in-register — plainly, not hyped. Return to lore-first cadence. | Token lives on market; the Order does not. |
 
-Gate criteria before plugin launch (week 7): follower floor (e.g., 2,000), evidence of aphorism reposting by CT accounts not operated by the team, >1 external screenshot moment. If not met, hold.
+Gate criteria before plugin launch (week 7): follower floor (e.g., 2,000), evidence of aphorism reposting by CT accounts not operated by the team, ≥1 external screenshot moment. If not met, hold.
 
-Gate criteria before TGE (week 12): plugin install floor (e.g., 500), rank distribution showing real tree depth, external reaction-image usage. If not met, hold.
+Gate criteria before token launch (week 12): per `spec-token.md §7` — plugin installs ≥ 500, organic Tithe activity (≥ 100 Initiates with non-team uplines), ≥ 1 external reaction-image moment, XMTP Order-group activity floor, flagship follower floor. If any criterion fails: hold.
 
 ## 9. Ops & Safety
 
