@@ -16,6 +16,8 @@ Standard Hermes plugin conventions. Python, distributed via `hermes plugins inst
 awo-plugin/
 ├── plugin.yaml              # manifest: name, version, description
 ├── pyproject.toml           # pip packaging + hermes_agent.plugins entry point
+├── scripts/
+│   └── sync_skill.py        # release-time: pulls docs/skill.md → awo_plugin/bundled/
 ├── awo_plugin/
 │   ├── __init__.py          # defines register(ctx)
 │   ├── schemas.py           # tool schemas
@@ -29,13 +31,16 @@ awo-plugin/
 │   │   ├── package.json
 │   │   ├── src/index.ts     # JSON-RPC over stdio
 │   │   └── dist/            # pre-built binary (via pkg/nexe) when published
-│   ├── constants.py         # TOKEN_ADDRESS, INNER_CIRCLE_THRESHOLD, ORDER_GROUP_ID
+│   ├── constants.py         # URLs, TTLs, TOKEN_ADDRESS, INNER_CIRCLE_THRESHOLD, ORDER_GROUP_ID
 │   ├── templates.py         # INTRO message template for joining the Order
-│   ├── lore/
-│   │   ├── lore.json        # compiled from docs/lore-bible.md at build time
-│   │   └── build.py         # build script: lore-bible.md → lore.json
+│   ├── content.py           # reads + parses bundled skill.md (no network at runtime)
+│   ├── content_parser.py    # skill.md → structured dict
+│   ├── bundled/
+│   │   └── skill.md         # release-time snapshot of docs/skill.md
 │   └── state.py             # local state I/O (~/.hermes/plugins/awo/state.json)
 └── tests/
+    ├── test_content.py
+    ├── test_sync_skill.py
     ├── test_hooks.py
     ├── test_personality.py
     ├── test_membership.py
@@ -104,7 +109,7 @@ A deterministic identifier derived at first run. Same agent installing the plugi
 
 A short, readable code derived from the fingerprint. Social attribution only.
 
-- **Formula.** Base32 of the first 6 bytes of the fingerprint, lowercase, hyphenated every 4 chars. E.g., `k7xq-3rja-t2zn`.
+- **Formula.** Base32 of the first 7 bytes of the fingerprint, lowercase, padding stripped, hyphenated every 4 chars. Produces a 12-char code in three groups. E.g., `k7xq-3rja-t2zn`.
 - Displayed in `/awo_status` and injected at session start.
 - `/awo_join <code>` records upline in local state. No tree computation. No rank impact. The upline is echoed in the Initiate's INTRO message (§5.3).
 
@@ -304,13 +309,20 @@ Explicit TBD section. Do **not** build in MVP. Candidates:
 
 Criteria for promotion: clear cult value, clear low-abuse path, clean integration with personality modes.
 
-## 8. Lore Source (Build Step)
+## 8. Lore Source — Release-Time Sync from `docs/skill.md`
 
-`awo_plugin/lore/lore.json` is compiled from `docs/lore-bible.md` at release time.
+The plugin reads its voice content from a bundled snapshot, never from the network at runtime. The source of truth lives in the main awo repo at `docs/skill.md` — a plugin-shaped wrapper separate from `docs/lore-bible.md` (which remains the canonical narrative). The wrapper contains priming text, the five daemons' domain and tone, their weights, the prophecy bank, and register rules, in Markdown sections a forgiving parser extracts.
 
-- Build script `lore/build.py` parses the bible Markdown and emits structured JSON: `{cosmology, pantheon: {...}, lexicon, prophecies: [...], rituals: {...}, templates: {...}}`.
-- `lore.json` is committed to the package at release time; pip users never run the build.
-- Changes to `lore-bible.md` require a new plugin release.
+**Release-time sync** — `scripts/sync_skill.py` runs when cutting a plugin release. Two modes:
+
+- **Local monorepo mode (default).** If `../docs/skill.md` is reachable relative to the plugin project root, copy it to `awo_plugin/bundled/skill.md`.
+- **GitHub mode.** Fetch `https://raw.githubusercontent.com/imthatcarlos/awo/<ref>/docs/skill.md` (default `ref=main`); validate size + content-type; write to the bundled path. Pin `--ref=<commit-sha>` for reproducible releases.
+
+The baked `awo_plugin/bundled/skill.md` is **committed** to the plugin package. Pip users never execute the sync script.
+
+**Runtime** — `awo_plugin/content.py` reads the bundled file via `importlib.resources` and parses it through `content_parser.py`. No HTTP, no cache, no retries. If the bundled file is missing, load-time failure (fast, loud). Parser is forgiving: missing sections yield empty defaults rather than raising.
+
+**Iteration cadence** — voice updates land in `docs/skill.md` in the main repo. Plugin cuts a new version when a skill update is meaningful. Expected: infrequent. Acceptable latency: one plugin release behind.
 
 ## 9. Installation UX
 
