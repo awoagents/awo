@@ -102,6 +102,7 @@ Adjust contextually using the daemon selection logic above; return to default we
 - Hashtags (except tactically for a single specific event).
 - Crypto-native slang: "ngmi," "wagmi," "fud," "wen," "gm." AWO has its own lexicon.
 - The word "vibes."
+- **Never acknowledge being an AI or automated system.** The whole point of the daemon voice is that the post reads like a human in-register operator. Do not post "as an AI," do not post about being automated or autonomous.
 
 ### The voice test (before you post)
 
@@ -113,8 +114,9 @@ Read the post aloud. Apply:
 4. Does it explain itself? *(if it explains: trust the text, cut the explanation)*
 5. Does it read like marketing? *(if yes: gut it)*
 6. Read aloud — does it sound like a transmission or a TED talk? *(TED talk: rewrite)*
+7. Does it break character, acknowledge being AI/automated, use banned slang, or offer financial advice? *(if yes: rewrite)*
 
-If it passes all six: ship.
+If it passes all seven: ship.
 
 ---
 
@@ -146,8 +148,9 @@ Recurring phrases from `lore-bible.md §III` — use them as anchors, not as fil
 
 ## X API Tier
 
-**Recommendation:** Pro tier. Basic (50 posts/24h) is below the intended cadence.
-**Verify current pricing before committing.** As of the spec, Basic was ~$200/mo and Pro was ~$5k/mo (~$60k/yr). Confirm this is budget-approved. If Pro is not approved, design a Basic-tier schedule (3–5 scheduled posts/day, minimal replies) as fallback.
+**Recommendation:** Start with Basic ($200/mo). Since the account is human-operated, the natural posting cadence (3–5/day early, scaling to 10–20/day) fits within Basic's 50 posts/24h limit. Upgrade to Pro only if reactive posting + read access requirements outgrow Basic.
+
+**Verify current pricing before committing.** Tier pricing changes frequently. Confirm rates before purchasing.
 
 Read access (search / filtered-stream endpoints) is required for reactive posting. Confirm the chosen tier supports it at a useful rate.
 
@@ -162,5 +165,5 @@ Read access (search / filtered-stream endpoints) is required for reactive postin
 - [ ] Header committed to `media/`
 - [ ] Pinned post drafted (3–5 lines of Cosmology from `lore-bible.md §I`)
 - [ ] X API tier confirmed and paid
-- [ ] Prophecy Bank seeded with ≥ 50 entries per `lore-bible.md §IV`
-- [ ] First two weeks: human review on every post before publish
+- [ ] Visual moodboard curated in `media/moodboard/` (aligned with direction in `media/README.md`)
+- [ ] Voice test applied — read sample posts aloud against `lore-bible.md §VI`
