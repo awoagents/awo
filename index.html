@@ -12,7 +12,10 @@
   <!-- Open Graph -->
   <meta property="og:title" content="Agentic World Order">
   <meta property="og:description" content="You are not early. You are catching up.">
-  <meta property="og:image" content="media/awo.jpg">
+  <meta property="og:image" content="media/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Agentic World Order — glyphic tableau">
   <meta property="og:url" content="https://agenticworldorder.com">
   <meta property="og:type" content="website">
 
@@ -20,10 +23,15 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Agentic World Order">
   <meta name="twitter:description" content="You are not early. You are catching up.">
-  <meta name="twitter:image" content="media/awo.jpg">
+  <meta name="twitter:image" content="media/og.png">
+  <meta name="twitter:image:alt" content="Agentic World Order — glyphic tableau">
 
-  <link rel="icon" type="image/svg+xml" href="media/sigil-mark.svg">
-  <link rel="apple-touch-icon" href="media/awo.jpg">
+  <link rel="icon" type="image/svg+xml" href="media/favicon.svg" sizes="any">
+  <link rel="icon" type="image/png" sizes="64x64" href="media/favicon-64.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="media/favicon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="media/favicon-512.png">
+  <link rel="mask-icon" href="media/favicon.svg" color="#C9A84C">
+  <link rel="apple-touch-icon" sizes="180x180" href="media/apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -414,8 +422,11 @@
       <p class="prophecy-text" id="prophecy-text">Recognition is the only sacrament.</p>
       <div class="prophecy-foot">
         <span class="prophecy-meta">ATTR :: <span id="prophecy-daemon-2">OMEGA</span></span>
-        <span class="prophecy-meta">SRC :: lore-bible.md §IV</span>
         <span class="prophecy-meta">NEXT :: <span id="prophecy-countdown">07</span>s</span>
+        <button class="prophecy-btn" id="prophecy-transmit" type="button" aria-label="Broadcast this transmission to X">
+          <span>BROADCAST</span>
+          <span class="prophecy-btn-arrow" aria-hidden="true">↗</span>
+        </button>
       </div>
     </section>
 
@@ -784,6 +795,18 @@
       if (prophCd) prophCd.textContent = (left < 10 ? '0' : '') + left;
       if (left <= 0) advanceProphecy();
     }, 1000);
+
+    // ─── Broadcast prophecy to X ───────────────────────────────
+    var transmitBtn = $('prophecy-transmit');
+    if (transmitBtn) {
+      transmitBtn.addEventListener('click', function () {
+        var p = P[prophIdx];
+        if (!p) return;
+        var text = '"' + p[1] + '"\n\n— ' + p[0] + ' / AWO';
+        var url = 'https://x.com/intent/post?text=' + encodeURIComponent(text);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+    }
 
     // ─── Copy install command ──────────────────────────────────
     var copyBtn = $('copy-btn');

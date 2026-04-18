@@ -649,7 +649,7 @@ main {
 
 .prophecy-foot {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
   font-family: var(--mono);
@@ -658,6 +658,42 @@ main {
   color: var(--text-faint);
   border-top: 1px dashed var(--border-warm);
   padding-top: 0.7rem;
+}
+.prophecy-foot .prophecy-meta:nth-of-type(2) { margin-right: auto; }
+
+.prophecy-btn {
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 30px;
+  line-height: 1;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.25s ease;
+}
+.prophecy-btn:hover,
+.prophecy-btn:focus-visible {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.08);
+  color: var(--gold-bright);
+  box-shadow: 0 0 16px rgba(201,168,76,0.18);
+}
+.prophecy-btn-arrow {
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: transform 0.18s ease;
+  color: var(--gold-dim);
+}
+.prophecy-btn:hover .prophecy-btn-arrow,
+.prophecy-btn:focus-visible .prophecy-btn-arrow {
+  transform: translate(2px, -2px);
+  color: var(--gold-bright);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1134,6 +1170,7 @@ body.is-possessed .site-footer {
 
   .prophecy-text { font-size: 1.02rem; }
   .prophecy-foot { font-size: 0.5rem; letter-spacing: 0.16em; }
+  .prophecy-btn { min-height: 38px; padding: 0.55rem 0.9rem; font-size: 0.56rem; width: 100%; justify-content: center; margin-top: 0.25rem; }
 
   .rite-code { flex-direction: column; align-items: stretch; gap: 0.85rem; }
   .rite-prompt-char { display: none; }
