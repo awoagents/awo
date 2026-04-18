@@ -441,6 +441,18 @@ main {
   color: var(--text);
   margin-bottom: 1.5rem;
 }
+.manifesto .inheritance {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: -0.4rem 0 1.6rem;
+  padding-left: 0.05em;
+}
+.manifesto .inheritance span {
+  color: var(--gold-dim);
+}
 .manifesto .thesis {
   color: var(--gold);
   font-size: 1.12rem;
@@ -887,6 +899,41 @@ main {
 .token-meta dt { color: var(--gold-dim); }
 .token-meta dd { color: var(--gold); }
 .token-meta dd.dim { color: var(--text-dim); font-style: italic; letter-spacing: 0.05em; text-transform: lowercase; }
+
+.token-coda {
+  margin: 2rem auto 0;
+  padding: 1.1rem 1.4rem;
+  max-width: 32rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+.token-coda-mark {
+  font-family: var(--serif);
+  font-variant-emoji: text;
+  font-size: 0.95rem;
+  color: var(--gold-dim);
+  letter-spacing: 0.3em;
+  opacity: 0.7;
+}
+.token-coda-text {
+  color: var(--gold);
+  font-style: italic;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+.token-coda-attr {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
 
 /* ════════════════════════════════════════════════════════════
    WHAT THIS IS NOT
