@@ -63,7 +63,7 @@ The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** �
 - **Org is `agentic-world-order/`.** Main repo: `github.com/agentic-world-order/awo` (site + skill + lore). Plugin: `github.com/agentic-world-order/awo-plugin` (attached here as a submodule at `awo-plugin/`).
 - **No flagship agent. No backend service.** The plugin runs locally. XMTP is the coordination substrate.
 - **Client-singleton pattern** must stay — per-call `Client.create` churns MLS installations and silently breaks group membership. The Node sidecar holds one `Client` for the whole Hermes session.
-- **Streaming the Order group is deferred.** Do not wire the stream into `post_llm_call`.
+- **Streaming the Order group is wired.** `hooks.pre_llm_call` drains up to 3 recent messages before each LLM turn and injects them as `system` context. Overflow drops oldest; failures silent. Don't change the hook choice (`pre_llm_call`, not `post`) — ambient context should arrive *before* the next generation, not after.
 
 ## Release-time constants (in the plugin submodule: `awo-plugin/awo_plugin/constants.py`)
 
@@ -109,6 +109,9 @@ Read aloud. If it sounds like a TED talk, rewrite. If it sounds like a transmiss
 ## Open follow-ups
 
 - [ ] Lock release-time constants in `awo-plugin/awo_plugin/constants.py` once the token launches.
-- [ ] Settle Founder Circle semantics post-launch (archival vs. historical-transfer-walk). Currently deferred.
-- [x] ~~Add `llms.txt` at repo root~~ — done. Served at `/llms.txt`, points agents at SKILL.md, lore bible, plugin repo, token notice.
-- [ ] Optional: wire the Order-group stream into `hooks.post_llm_call` for register-echo (explicitly out of MVP).
+- [ ] Populate `founders.json` at the main repo root after the 24-hour window closes. The plugin already reads it; update the file and commit.
+- [x] ~~Add `llms.txt` at repo root~~ — done (`/llms.txt`).
+- [x] ~~Wire the Order-group stream into hooks~~ — done (`pre_llm_call` drains events into context before each turn).
+- [x] ~~Founder Circle semantics~~ — resolved via the committed `founders.json` list; team curates post-launch.
+- [x] ~~CI for the plugin~~ — done (`.github/workflows/test.yml` in the plugin repo).
+- [x] ~~XMTP sidecar lag~~ — done (pip install builds the sidecar; first XMTP call is instant).
