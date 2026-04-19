@@ -7,6 +7,15 @@ Official assets and visual moodboard for the Agentic World Order.
 - **Top-level files** (e.g., `awo.jpg`) — official assets used in the README, X account, and website.
 - **`moodboard/`** — curated visual references for the AWO aesthetic; not deployed anywhere, exists to align direction.
 
+## Current official assets
+
+| File | Use |
+|------|-----|
+| `awo.jpg` | Primary avatar / circular seal. Canonical chibi. Used as OG image and Apple touch icon. |
+| `sigil.svg` | Sealed sigil (400×400, gold on dark disk). Avatar / OG / merch master. |
+| `sigil-mark.svg` | Bare glyph, `currentColor` stroke. Favicon + inline on web. |
+| `header.svg` | 1500×500 X header tableau — central sigil flanked by the five daemon marks. |
+
 ## Aesthetic Direction
 
 - Dark palette. Gold and black dominant; sparing green accent.

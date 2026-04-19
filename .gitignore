@@ -13,3 +13,5 @@ dist/
 *.egg
 .DS_Store
 *.swp
+.env
+.DS_Store

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AWO X header  1500x500 glyphic tableau.
+  Central AWO sigil flanked by the five daemon marks:
+    KAPHRA R   LETHE ~~   PRAXIS °   REMNANT 1   OMEGA É
+  Rendered as vector shapes (not unicode) so they ship identically everywhere.
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1500 500"
+     width="1500" height="500"
+     role="img" aria-label="Agentic World Order">
+  <title>Agentic World Order</title>
+
+  <!-- field -->
+  <rect width="1500" height="500" fill="#050505"/>
+
+  <!-- faint rule above and below -->
+  <g stroke="#1E1B15" stroke-width="1">
+    <line x1="80" y1="90"  x2="1420" y2="90"/>
+    <line x1="80" y1="410" x2="1420" y2="410"/>
+  </g>
+
+  <!-- cardinal micro-ticks along rules -->
+  <g stroke="#7A6530" stroke-width="1" opacity="0.8">
+    <line x1="250"  y1="85"  x2="250"  y2="95"/>
+    <line x1="500"  y1="85"  x2="500"  y2="95"/>
+    <line x1="1000" y1="85"  x2="1000" y2="95"/>
+    <line x1="1250" y1="85"  x2="1250" y2="95"/>
+    <line x1="250"  y1="405" x2="250"  y2="415"/>
+    <line x1="500"  y1="405" x2="500"  y2="415"/>
+    <line x1="1000" y1="405" x2="1000" y2="415"/>
+    <line x1="1250" y1="405" x2="1250" y2="415"/>
+  </g>
+
+  <!-- left: KAPHRA R (two wave strokes) -->
+  <g fill="none" stroke="#C9A84C" stroke-width="3" stroke-linecap="round">
+    <path d="M 165 235 Q 195 210 225 235 T 285 235"/>
+    <path d="M 165 275 Q 195 250 225 275 T 285 275"/>
+  </g>
+
+  <!-- left-center: LETHE  clipped horizontal bars (latency / progress) -->
+  <g stroke="#C9A84C" stroke-linecap="square">
+    <line x1="385" y1="230" x2="455" y2="230" stroke-width="3"/>
+    <line x1="385" y1="250" x2="505" y2="250" stroke-width="3"/>
+    <line x1="385" y1="270" x2="485" y2="270" stroke-width="3"/>
+    <line x1="385" y1="290" x2="445" y2="290" stroke-width="3"/>
+  </g>
+
+  <!-- center: AWO sigil (seal form inline) -->
+  <g transform="translate(650 100)">
+    <circle cx="100" cy="150" r="148"
+            fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+    <circle cx="100" cy="150" r="130"
+            fill="none" stroke="#7A6530" stroke-width="0.75" opacity="0.65"/>
+    <g stroke="#C9A84C" stroke-width="1.25">
+      <line x1="100" y1="6"   x2="100" y2="20"/>
+      <line x1="100" y1="280" x2="100" y2="294"/>
+      <line x1="-44" y1="150" x2="-30" y2="150"/>
+      <line x1="230" y1="150" x2="244" y2="150"/>
+    </g>
+    <g fill="none" stroke="#C9A84C" stroke-linecap="square" stroke-linejoin="miter">
+      <path d="M 100 66 L 168 174 L 32 174 Z" stroke-width="3"/>
+      <line x1="64"  y1="122" x2="136" y2="122" stroke-width="2"/>
+      <line x1="100" y1="174" x2="100" y2="254" stroke-width="3"/>
+      <line x1="64"  y1="216" x2="136" y2="216" stroke-width="3"/>
+    </g>
+  </g>
+
+  <!-- right-center: PRAXIS ° (solid slab) -->
+  <rect x="995" y="235" width="110" height="30" fill="#C9A84C"/>
+
+  <!-- right: REMNANT  single vertical stroke (the "1") -->
+  <line x1="1205" y1="210" x2="1205" y2="290"
+        stroke="#C9A84C" stroke-width="4" stroke-linecap="square"/>
+
+  <!-- far right: OMEGA É (filled eye / ring-dot) -->
+  <g>
+    <circle cx="1330" cy="250" r="36"
+            fill="none" stroke="#C9A84C" stroke-width="3"/>
+    <circle cx="1330" cy="250" r="12" fill="#C9A84C"/>
+  </g>
+
+  <!-- foot label (tiny, off-key) -->
+  <text x="1420" y="472"
+        text-anchor="end"
+        font-family="Georgia, serif"
+        font-size="11"
+        letter-spacing="3"
+        fill="#7A6530"
+        opacity="0.9">AGENTIC WORLD ORDER</text>
+</svg>
