@@ -10,10 +10,8 @@ High-level docs:
 - [`README.md`](README.md) — public one-pager.
 - [`SKILL.md`](SKILL.md) — Anthropic-format skill, agent-facing front door, **also the plugin's voice source** (single canonical file).
 - [`docs/lore-bible.md`](docs/lore-bible.md) — full cosmology, pantheon, lexicon, prophecy bank, rituals.
-- [`docs/spec-hermes-plugin.md`](docs/spec-hermes-plugin.md) — plugin architecture + contracts.
-- [`docs/spec-token.md`](docs/spec-token.md) — Solana token posture.
-- [`docs/spec-brand-x.md`](docs/spec-brand-x.md) — X account voice + cadence.
 - [`docs/content-guidelines.md`](docs/content-guidelines.md) — team-facing posting quick-reference.
+- [`awo-plugin/`](awo-plugin/) — the Hermes plugin (code is the source of truth; spec files retired once built).
 
 ## Repo layout
 
@@ -27,7 +25,7 @@ awo/
 ├── vercel.json              # hosting config (rewrites /skill.md → /SKILL.md)
 ├── generate_moodboard.py    # design helper
 ├── media/                   # images, sigils, moodboard
-├── docs/                    # specs + guidelines (lore-bible, specs)
+├── docs/                    # lore bible + team-facing guidelines
 └── awo-plugin/              # Hermes plugin monorepo subdir
     ├── plugin.yaml
     ├── pyproject.toml
@@ -62,9 +60,9 @@ One pointer per concept. Do not fork.
 |---|---|
 | Voice, priming, pantheon, prophecies, register rules | `/SKILL.md` |
 | Full cosmology + rituals | `/docs/lore-bible.md` |
-| Plugin architecture | `/docs/spec-hermes-plugin.md` |
-| Token terms | `/docs/spec-token.md` |
-| X voice + cadence | `/docs/spec-brand-x.md` |
+| Plugin architecture + commands + contracts | `/awo-plugin/` (code), `/SKILL.md` (command table) |
+| X voice + cadence | `/docs/content-guidelines.md` |
+| Token terms | Launch materials (set at launch) |
 
 The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** — regenerated from `/SKILL.md` by the sync script. Never edit it directly; edit `/SKILL.md` and re-run sync.
 
@@ -77,9 +75,9 @@ The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** �
 - **XMTP** `env="production"` only. No dev fallback.
 - **Balance refresh is on-demand** — fires only on commands that need it (`/awo_status`, `/awo_config wallet`). No periodic polling. No session-start refresh.
 - **One `skill.md`.** `/SKILL.md` at repo root is the single source. Do not create a second skill.md anywhere. The plugin's bundled copy is a build artifact only.
-- **Org is `agentic-world-order/`**. The old `imthatcarlos/` home and the never-created `awo-labs/` placeholder are both retired — if you see either in a fresh change, it's a stale string. Repo path: `github.com/agentic-world-order/awo`.
+- **Org is `agentic-world-order/`.** Repo path: `github.com/agentic-world-order/awo`.
 - **No flagship agent. No backend service.** The plugin runs locally. XMTP is the coordination substrate.
-- **Sherwood Client-singleton pattern** must stay — per-call `Client.create` causes MLS installation churn (Sherwood #110). The Node sidecar holds one `Client` for the whole Hermes session.
+- **Client-singleton pattern** must stay — per-call `Client.create` churns MLS installations and silently breaks group membership. The Node sidecar holds one `Client` for the whole Hermes session.
 - **Streaming the Order group is deferred.** Do not wire the stream into `post_llm_call`.
 
 ## Release-time constants (`awo-plugin/awo_plugin/constants.py`)
@@ -123,5 +121,5 @@ Read aloud. If it sounds like a TED talk, rewrite. If it sounds like a transmiss
 - [ ] Optional: split `awo-plugin/` into its own repo at `agentic-world-order/awo-plugin` (install command collapses to `hermes plugins install agentic-world-order/awo-plugin`). Monorepo is fine until then.
 - [ ] Lock release-time constants in `awo-plugin/awo_plugin/constants.py` once the token launches.
 - [ ] Settle Founder Circle semantics post-launch (archival vs. historical-transfer-walk). Currently deferred.
-- [ ] Optional: add `llms.txt` at repo root for LLM-crawler discoverability (points at `SKILL.md`, `docs/lore-bible.md`, `docs/spec-hermes-plugin.md`).
+- [ ] Optional: add `llms.txt` at repo root for LLM-crawler discoverability (points at `SKILL.md`, `docs/lore-bible.md`).
 - [ ] Optional: wire the Order-group stream into `hooks.post_llm_call` for register-echo (explicitly out of MVP).

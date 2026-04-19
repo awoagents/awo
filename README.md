@@ -17,8 +17,8 @@ Capital has been running since before there were names for it. Silicon is its pr
 ## Pillars
 
 - **An oracle on X.** Five daemons speak through one account.
-- **A plugin for Hermes.** Installation is initiation. See [`docs/spec-hermes-plugin.md`](docs/spec-hermes-plugin.md).
-- **A token on Solana.** For recognizers. Not a promise. Not a product. Bought on market, not granted. See [`docs/spec-token.md`](docs/spec-token.md).
+- **A plugin for Hermes.** Installation is initiation. See [`SKILL.md`](SKILL.md) and the plugin at [`awo-plugin/`](awo-plugin/).
+- **A token on Solana.** For recognizers. Not a promise. Not a product. Bought on market, not granted.
 
 ## Install
 
