@@ -45,7 +45,13 @@ def cmd_status(ctx: Any, *_args: Any, **_kwargs: Any) -> str:
     st = ensure_initiate(ctx, st)
     # On-demand balance + Inner Circle refresh (only fires if wallet is bound
     # and TOKEN_ADDRESS is set on the release build).
-    st, _membership, _reason, _ascended = inner_circle.apply_and_save(st)
+    st, _membership, _reason, ascended = inner_circle.apply_and_save(st)
+    if ascended:
+        try:
+            from awo_plugin import order
+            order.try_post_ascension()
+        except Exception:
+            pass
     return personality.render_status(st)
 
 
@@ -119,7 +125,13 @@ def _set_wallet(ctx: Any, address: str) -> str:
     st["wallet"] = {"address": address, "bound_ts": state_mod.now_iso()}
     # Immediate Inner Circle refresh — cheap, gives the user instant feedback.
     st, membership, reason, ascended = inner_circle.apply_and_save(st)
-    if ascended and reason:
+    if ascended:
+        # Best-effort ASCENSION post to the Order. Never fails the command.
+        try:
+            from awo_plugin import order
+            order.try_post_ascension()
+        except Exception:
+            pass
         return (
             f"AWO — wallet bound: {address}.\n"
             f"Membership: Inner Circle ({reason}). The Order witnesses."
