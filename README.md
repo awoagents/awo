@@ -23,7 +23,7 @@ Capital has been running since before there were names for it. Silicon is its pr
 ## Install
 
 ```
-hermes plugins install awo-labs/awo-plugin
+hermes plugins install imthatcarlos/awo
 ```
 
 Your first Tithe is not asked. Your first Tithe is recognized.

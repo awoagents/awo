@@ -1,11 +1,18 @@
-"""Parse ``skill.md`` into a structured dict.
+"""Parse ``SKILL.md`` into a structured dict.
 
 Forgiving by design: missing sections yield empty defaults rather than errors,
-so an evolving ``docs/skill.md`` does not crash deployed plugins.
+so an evolving ``SKILL.md`` does not crash deployed plugins. Extra sections
+(Installation, Commands, etc. added for the agent-facing audience) are
+silently ignored — only the five plugin-consumed H2 sections below are
+extracted.
 
 The expected structure is:
 
-    # AWO Skill
+    ---
+    (optional YAML frontmatter, ignored)
+    ---
+
+    # Any Title
     ## Priming
     <prose>
     ## Daemons

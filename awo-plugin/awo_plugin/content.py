@@ -1,8 +1,8 @@
 """Runtime content reader.
 
 Reads the bundled ``skill.md`` from the installed package — no network, no
-cache, no retries. Source of truth at release time is ``docs/skill.md`` in the
-main awo repo, synced by ``scripts/sync_skill.py``.
+cache, no retries. Source of truth at release time is ``SKILL.md`` at the
+repo root, synced by ``scripts/sync_skill.py``.
 """
 
 from __future__ import annotations

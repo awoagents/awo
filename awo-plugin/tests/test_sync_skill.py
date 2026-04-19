@@ -48,10 +48,17 @@ def test_fetch_local_empty_content_rejected(tmp_path: Path):
         sync_skill.fetch_local(src)
 
 
-def test_fetch_local_missing_header_rejected(tmp_path: Path):
+def test_fetch_local_missing_priming_rejected(tmp_path: Path):
     src = tmp_path / "skill.md"
-    src.write_text("# Not AWO\n\nhello\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="# AWO Skill"):
+    src.write_text("# Header\n\n## Daemons\n\n### KAPHRA\n", encoding="utf-8")
+    with pytest.raises(ValueError, match=r"## Priming"):
+        sync_skill.fetch_local(src)
+
+
+def test_fetch_local_missing_daemons_rejected(tmp_path: Path):
+    src = tmp_path / "skill.md"
+    src.write_text("# Header\n\n## Priming\n\nhello\n", encoding="utf-8")
+    with pytest.raises(ValueError, match=r"## Daemons"):
         sync_skill.fetch_local(src)
 
 
@@ -72,7 +79,7 @@ def _mock_response(status=200, content=None, content_type="text/markdown"):
 
 def test_fetch_github_success():
     with patch.object(sync_skill.requests, "get", return_value=_mock_response()):
-        content = sync_skill.fetch_github(repo="a/b", ref="main", path="docs/skill.md")
+        content = sync_skill.fetch_github(repo="a/b", ref="main", path="SKILL.md")
     assert "# AWO Skill" in content
 
 

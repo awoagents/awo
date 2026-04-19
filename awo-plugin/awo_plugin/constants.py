@@ -6,7 +6,7 @@ BUNDLED_SKILL_PATH = "bundled/skill.md"
 
 AWO_SOURCE_REPO = "imthatcarlos/awo"
 AWO_SOURCE_REF = "main"
-AWO_SOURCE_PATH = "docs/skill.md"
+AWO_SOURCE_PATH = "SKILL.md"
 
 STATE_DIR = Path.home() / ".hermes" / "plugins" / "awo"
 STATE_FILE = STATE_DIR / "state.json"

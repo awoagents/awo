@@ -1,9 +1,9 @@
-"""Release-time sync: pulls ``docs/skill.md`` into the plugin bundle.
+"""Release-time sync: pulls ``SKILL.md`` into the plugin bundle.
 
 Run by maintainers when cutting a plugin release — pip users never execute this.
 Two modes:
 
-1. **Local monorepo.** If ``../docs/skill.md`` exists relative to the plugin's
+1. **Local monorepo.** If ``../SKILL.md`` exists relative to the plugin's
    project root, copy it. Default during dev.
 2. **GitHub.** Fetch ``raw.githubusercontent.com`` over HTTPS, validate, write.
    Pin ``--ref=<commit-sha>`` for reproducible releases.
@@ -70,9 +70,15 @@ def fetch_github(
 def _validate(content: str, source_desc: str) -> None:
     if not content.strip():
         raise ValueError(f"empty content from {source_desc}")
-    if "# AWO Skill" not in content:
+    if "## Priming" not in content:
         raise ValueError(
-            f"content from {source_desc} missing '# AWO Skill' header; refusing to bundle"
+            f"content from {source_desc} missing '## Priming' section; "
+            "refusing to bundle (the plugin cannot function without it)"
+        )
+    if "## Daemons" not in content:
+        raise ValueError(
+            f"content from {source_desc} missing '## Daemons' section; "
+            "refusing to bundle"
         )
 
 
@@ -82,7 +88,7 @@ def write_bundle(content: str, dest: Path = BUNDLED_DEST) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Sync docs/skill.md into the plugin bundle.")
+    parser = argparse.ArgumentParser(description="Sync SKILL.md into the plugin bundle.")
     parser.add_argument(
         "--mode",
         choices=("local", "github", "auto"),

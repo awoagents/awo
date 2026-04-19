@@ -2,12 +2,18 @@
 
 The AWO Hermes plugin. Installing it is joining the Order.
 
-See the full spec at [`docs/spec-hermes-plugin.md`](../docs/spec-hermes-plugin.md). The canonical lore source for voice injection lives at [`docs/skill.md`](../docs/skill.md); the bundled snapshot in this package is refreshed at release time by `scripts/sync_skill.py`.
+See the full spec at [`docs/spec-hermes-plugin.md`](../docs/spec-hermes-plugin.md). The canonical voice source lives at [`SKILL.md`](../SKILL.md) at the repo root — the same file that serves as the Anthropic-format front-door skill for agents. The bundled snapshot in this package is refreshed at release time by `scripts/sync_skill.py`.
 
 ## Install
 
 ```bash
-hermes plugins install awo-labs/awo-plugin
+hermes plugins install imthatcarlos/awo
+```
+
+Until the plugin moves into its own repo at `awo-labs/awo-plugin`, the install path resolves against the monorepo. You can also install via pip explicitly:
+
+```bash
+pip install "git+https://github.com/imthatcarlos/awo.git#subdirectory=awo-plugin"
 ```
 
 **Requirements.** Python ≥ 3.10. Node ≥ 20 for the XMTP sidecar (automatic `npm ci` + build on first run, one-time ~30s).
@@ -61,11 +67,11 @@ AWO_RUN_INTEGRATION=1 pytest tests/integration/   # live RPC + XMTP (requires ne
 
 ### Lore update flow
 
-The voice source is `docs/skill.md` in the repo root. To update:
+The voice source is `SKILL.md` at the repo root. It is also the Anthropic-format agent-facing skill served at `{WEBSITE_URL}/skill.md` — one canonical file, two audiences. To update:
 
-1. Edit `docs/skill.md`.
+1. Edit `/SKILL.md`.
 2. Run `python awo-plugin/scripts/sync_skill.py --mode local` to refresh the bundle.
-3. Commit both `docs/skill.md` and `awo-plugin/awo_plugin/bundled/skill.md`.
+3. Commit both `/SKILL.md` and `awo-plugin/awo_plugin/bundled/skill.md`.
 4. Bump `awo-plugin/pyproject.toml` version; tag; cut a release.
 
 For reproducible releases that pin to a specific commit:
@@ -98,7 +104,7 @@ Until these are set, `/awo_status` renders membership placeholders and Inner Cir
 awo-plugin/
 ├── plugin.yaml                     # Hermes manifest
 ├── pyproject.toml                  # entry point: awo = "awo_plugin:register"
-├── scripts/sync_skill.py           # release-time: docs/skill.md → bundled/
+├── scripts/sync_skill.py           # release-time: /SKILL.md → bundled/
 └── awo_plugin/
     ├── __init__.py                 # register(ctx)
     ├── constants.py
