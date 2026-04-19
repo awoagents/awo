@@ -1,0 +1,3 @@
+[submodule "awo-plugin"]
+	path = awo-plugin
+	url = https://github.com/agentic-world-order/awo-plugin.git
