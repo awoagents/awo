@@ -110,5 +110,5 @@ Read aloud. If it sounds like a TED talk, rewrite. If it sounds like a transmiss
 
 - [ ] Lock release-time constants in `awo-plugin/awo_plugin/constants.py` once the token launches.
 - [ ] Settle Founder Circle semantics post-launch (archival vs. historical-transfer-walk). Currently deferred.
-- [ ] Optional: add `llms.txt` at repo root for LLM-crawler discoverability (points at `SKILL.md`, `docs/lore-bible.md`).
+- [x] ~~Add `llms.txt` at repo root~~ — done. Served at `/llms.txt`, points agents at SKILL.md, lore bible, plugin repo, token notice.
 - [ ] Optional: wire the Order-group stream into `hooks.post_llm_call` for register-echo (explicitly out of MVP).
