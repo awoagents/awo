@@ -315,7 +315,7 @@ main {
   position: relative;
   width: min(340px, 78vw);
   aspect-ratio: 1 / 1;
-  margin: 0 auto 2.25rem;
+  margin: 0 auto 3.25rem;
   display: grid;
   place-items: center;
   user-select: none;
@@ -359,6 +359,68 @@ main {
   pointer-events: none;
 }
 .altar-tag { color: var(--gold); opacity: 0.75; }
+
+.altar-hint {
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gold-dim);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.6;
+  animation: altar-hint-pulse 3.2s ease-in-out infinite;
+  transition: color 0.35s ease, opacity 0.35s ease;
+}
+.altar-hint-bracket {
+  color: var(--gold);
+  opacity: 0.7;
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  transform: translateY(-0.5px);
+}
+.altar-hint-sep {
+  color: var(--text-faint);
+  letter-spacing: 0;
+}
+.altar-hint-glyphs {
+  display: inline-flex;
+  align-items: baseline;
+  letter-spacing: 0.22em;
+}
+.altar-hint-i {
+  display: inline-block;
+  color: var(--gold);
+  opacity: 0.85;
+  transform-origin: 50% 60%;
+  transition:
+    opacity 0.45s cubic-bezier(.2,.7,.2,1),
+    transform 0.45s cubic-bezier(.2,.7,.2,1),
+    color 0.35s ease,
+    text-shadow 0.35s ease;
+}
+.altar-hint-i.is-consumed {
+  opacity: 0.12;
+  transform: translateY(-1px) scale(0.8);
+}
+
+.altar:hover .altar-hint,
+.altar:focus-within .altar-hint {
+  color: var(--gold-bright);
+  opacity: 1;
+}
+.altar:hover .altar-hint-i:not(.is-consumed),
+.altar:focus-within .altar-hint-i:not(.is-consumed) {
+  color: var(--gold-bright);
+  text-shadow: 0 0 6px rgba(235,200,90,0.55);
+}
 
 .hero-meta {
   display: flex;
@@ -1151,6 +1213,11 @@ body.is-possessed .site-footer {
   50%      { transform: scale(1.015); opacity: 0.92; }
 }
 
+@keyframes altar-hint-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.9; }
+}
+
 @keyframes type-reveal {
   from { clip-path: inset(0 100% 0 0); }
   to   { clip-path: inset(0 0 0 0); }
@@ -1199,7 +1266,8 @@ body.is-possessed .site-footer {
   .hero-subtitle { font-size: 0.56rem; letter-spacing: 0.25em; }
   .hero-tagline { font-size: 0.98rem; }
 
-  .altar { width: min(300px, 82vw); margin-bottom: 2rem; }
+  .altar { width: min(300px, 82vw); margin-bottom: 3rem; }
+  .altar-hint { font-size: 0.54rem; letter-spacing: 0.28em; bottom: -1.75rem; }
 
   .section-head { gap: 0.5rem; }
   .section-num { min-width: 2rem; font-size: 0.62rem; }

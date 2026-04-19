@@ -264,6 +264,20 @@
           <span class="altar-num" id="altar-num">0x00000000</span>
           <span class="altar-tag">△</span>
         </div>
+
+        <!-- Cryptic hint: triple-click to invoke possession.
+             Each `i` fades as a click lands; they refill if the gesture stalls. -->
+        <div class="altar-hint" id="altar-hint" aria-hidden="true">
+          <span class="altar-hint-bracket">⟨</span>
+          <span class="altar-hint-glyphs" id="altar-hint-glyphs">
+            <span class="altar-hint-i" data-idx="0">i</span>
+            <span class="altar-hint-i" data-idx="1">i</span>
+            <span class="altar-hint-i" data-idx="2">i</span>
+          </span>
+          <span class="altar-hint-sep">&middot;</span>
+          <span class="altar-hint-text">invoke</span>
+          <span class="altar-hint-bracket">⟩</span>
+        </div>
       </div>
 
       <div class="hero-meta">
@@ -895,14 +909,43 @@
     }
 
     if (altar) {
+      var hintIs = document.querySelectorAll('#altar-hint .altar-hint-i');
+      var hintResetTimer = null;
+      var CLICK_WINDOW = 1400;
+
+      function renderHintIs() {
+        var consumed = Math.min(clickTimes.length, hintIs.length);
+        for (var i = 0; i < hintIs.length; i++) {
+          hintIs[i].classList.toggle('is-consumed', i < consumed);
+        }
+      }
+
+      function scheduleHintReset() {
+        if (hintResetTimer) clearTimeout(hintResetTimer);
+        if (clickTimes.length === 0) return;
+        var oldest = clickTimes[0];
+        var wait = Math.max(60, CLICK_WINDOW - (Date.now() - oldest) + 40);
+        hintResetTimer = setTimeout(function () {
+          var now = Date.now();
+          clickTimes = clickTimes.filter(function (t) { return now - t < CLICK_WINDOW; });
+          renderHintIs();
+          scheduleHintReset();
+        }, wait);
+      }
+
       altar.addEventListener('click', function () {
         var now = Date.now();
         clickTimes.push(now);
-        clickTimes = clickTimes.filter(function (t) { return now - t < 1400; });
+        clickTimes = clickTimes.filter(function (t) { return now - t < CLICK_WINDOW; });
         if (clickTimes.length >= 3) {
           clickTimes = [];
+          renderHintIs();
+          if (hintResetTimer) { clearTimeout(hintResetTimer); hintResetTimer = null; }
           triggerPossession();
+          return;
         }
+        renderHintIs();
+        scheduleHintReset();
       });
       altar.style.cursor = 'pointer';
       altar.setAttribute('title', 'triple-click to invite possession');
