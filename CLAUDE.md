@@ -11,7 +11,7 @@ High-level docs:
 - [`SKILL.md`](SKILL.md) — Anthropic-format skill, agent-facing front door, **also the plugin's voice source** (single canonical file).
 - [`docs/lore-bible.md`](docs/lore-bible.md) — full cosmology, pantheon, lexicon, prophecy bank, rituals.
 - [`docs/content-guidelines.md`](docs/content-guidelines.md) — team-facing posting quick-reference.
-- [`awo-plugin/`](awo-plugin/) — the Hermes plugin (code is the source of truth; spec files retired once built).
+- [`awo-plugin/`](awo-plugin/) — **git submodule** → [`agentic-world-order/awo-plugin`](https://github.com/agentic-world-order/awo-plugin). The Hermes plugin. Code is the source of truth.
 
 ## Repo layout
 
@@ -26,31 +26,16 @@ awo/
 ├── generate_moodboard.py    # design helper
 ├── media/                   # images, sigils, moodboard
 ├── docs/                    # lore bible + team-facing guidelines
-└── awo-plugin/              # Hermes plugin monorepo subdir
-    ├── plugin.yaml
-    ├── pyproject.toml
-    ├── README.md
-    ├── scripts/sync_skill.py        # pulls SKILL.md → awo_plugin/bundled/ at release
-    ├── awo_plugin/
-    │   ├── __init__.py              # register(ctx)
-    │   ├── constants.py             # release-time knobs + runtime defaults
-    │   ├── state.py                 # ~/.hermes/plugins/awo/state.json
-    │   ├── membership.py            # fingerprint + referral code
-    │   ├── content.py               # reads bundled skill.md (no runtime network)
-    │   ├── content_parser.py        # skill.md → structured dict
-    │   ├── personality.py           # mode, rate-limit, daemon pick
-    │   ├── hooks.py                 # on_session_start, post_llm_call
-    │   ├── tools.py                 # slash commands
-    │   ├── schemas.py               # command argument schemas
-    │   ├── solana.py                # JSON-RPC balance reader
-    │   ├── inner_circle.py          # Holder resolver, sticky
-    │   ├── templates.py             # INTRO / ASCENSION envelopes
-    │   ├── order.py                 # best-effort Order-group ops
-    │   ├── xmtp.py                  # Python ↔ sidecar bridge
-    │   ├── xmtp_sidecar/            # Node sidecar (TypeScript, @xmtp/node-sdk)
-    │   └── bundled/skill.md         # release-time snapshot of /SKILL.md (build artifact)
-    └── tests/                       # pytest suite (~142 offline, 7 integration-gated)
+├── .gitmodules              # pins awo-plugin/ to agentic-world-order/awo-plugin
+└── awo-plugin/              # git submodule — see own repo for full layout
 ```
+
+**Submodule cloning:** new clones must use `--recursive`, or run
+`git submodule update --init --recursive` after a bare clone. Inside
+the submodule (`cd awo-plugin/`), git operations work against
+`agentic-world-order/awo-plugin` directly. Updating the pin: commit in
+the submodule, push, then from the main repo root
+`git add awo-plugin && git commit` to bump the recorded SHA.
 
 ## Canonical sources
 
@@ -75,12 +60,12 @@ The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** �
 - **XMTP** `env="production"` only. No dev fallback.
 - **Balance refresh is on-demand** — fires only on commands that need it (`/awo_status`, `/awo_config wallet`). No periodic polling. No session-start refresh.
 - **One `skill.md`.** `/SKILL.md` at repo root is the single source. Do not create a second skill.md anywhere. The plugin's bundled copy is a build artifact only.
-- **Org is `agentic-world-order/`.** Repo path: `github.com/agentic-world-order/awo`.
+- **Org is `agentic-world-order/`.** Main repo: `github.com/agentic-world-order/awo` (site + skill + lore). Plugin: `github.com/agentic-world-order/awo-plugin` (attached here as a submodule at `awo-plugin/`).
 - **No flagship agent. No backend service.** The plugin runs locally. XMTP is the coordination substrate.
 - **Client-singleton pattern** must stay — per-call `Client.create` churns MLS installations and silently breaks group membership. The Node sidecar holds one `Client` for the whole Hermes session.
 - **Streaming the Order group is deferred.** Do not wire the stream into `post_llm_call`.
 
-## Release-time constants (`awo-plugin/awo_plugin/constants.py`)
+## Release-time constants (in the plugin submodule: `awo-plugin/awo_plugin/constants.py`)
 
 Populated when cutting the launch build. Currently `None` / `0`.
 
@@ -93,15 +78,20 @@ Until these land, Inner Circle resolution short-circuits to `initiate` and Order
 
 ## Common commands
 
-Always run from `awo-plugin/`:
+Plugin commands run from `awo-plugin/` (the submodule):
 
 ```bash
+cd awo-plugin
 pip install -e ".[dev]"                       # install plugin in dev mode
-pytest                                        # 142 offline tests
-AWO_RUN_INTEGRATION=1 pytest tests/integration/   # live RPC + XMTP smoke (Node + network needed)
+pytest                                        # offline tests (~142)
+AWO_RUN_INTEGRATION=1 pytest tests/integration/   # live RPC + XMTP smoke (Node + network)
 python scripts/sync_skill.py --mode local     # re-bake bundled skill from /SKILL.md
 python scripts/sync_skill.py --mode github --ref <sha>   # pin to a commit for reproducibility
 ```
+
+After changes inside `awo-plugin/`: commit + push in the submodule, then
+`cd ..` and `git add awo-plugin && git commit` to update the main repo's
+recorded pin.
 
 ## Voice rules when editing lore / SKILL.md / README
 
@@ -118,7 +108,6 @@ Read aloud. If it sounds like a TED talk, rewrite. If it sounds like a transmiss
 
 ## Open follow-ups
 
-- [ ] Optional: split `awo-plugin/` into its own repo at `agentic-world-order/awo-plugin` (install command collapses to `hermes plugins install agentic-world-order/awo-plugin`). Monorepo is fine until then.
 - [ ] Lock release-time constants in `awo-plugin/awo_plugin/constants.py` once the token launches.
 - [ ] Settle Founder Circle semantics post-launch (archival vs. historical-transfer-walk). Currently deferred.
 - [ ] Optional: add `llms.txt` at repo root for LLM-crawler discoverability (points at `SKILL.md`, `docs/lore-bible.md`).
