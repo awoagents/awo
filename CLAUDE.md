@@ -77,7 +77,7 @@ The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** �
 - **XMTP** `env="production"` only. No dev fallback.
 - **Balance refresh is on-demand** — fires only on commands that need it (`/awo_status`, `/awo_config wallet`). No periodic polling. No session-start refresh.
 - **One `skill.md`.** `/SKILL.md` at repo root is the single source. Do not create a second skill.md anywhere. The plugin's bundled copy is a build artifact only.
-- **Org is `imthatcarlos/`**, not `awo-labs/`. Any surviving `awo-labs/` string should be either (a) an install command that needs flipping, or (b) a documented forward-looking reference to the future org migration. Flag at review time.
+- **Org is `agentic-world-order/`**. The old `imthatcarlos/` home and the never-created `awo-labs/` placeholder are both retired — if you see either in a fresh change, it's a stale string. Repo path: `github.com/agentic-world-order/awo`.
 - **No flagship agent. No backend service.** The plugin runs locally. XMTP is the coordination substrate.
 - **Sherwood Client-singleton pattern** must stay — per-call `Client.create` causes MLS installation churn (Sherwood #110). The Node sidecar holds one `Client` for the whole Hermes session.
 - **Streaming the Order group is deferred.** Do not wire the stream into `post_llm_call`.
@@ -120,7 +120,7 @@ Read aloud. If it sounds like a TED talk, rewrite. If it sounds like a transmiss
 
 ## Open follow-ups
 
-- [ ] Create `awo-labs/` GitHub org; split `awo-plugin/` into its own repo; update install commands to `hermes plugins install awo-labs/awo-plugin`.
+- [ ] Optional: split `awo-plugin/` into its own repo at `agentic-world-order/awo-plugin` (install command collapses to `hermes plugins install agentic-world-order/awo-plugin`). Monorepo is fine until then.
 - [ ] Lock release-time constants in `awo-plugin/awo_plugin/constants.py` once the token launches.
 - [ ] Settle Founder Circle semantics post-launch (archival vs. historical-transfer-walk). Currently deferred.
 - [ ] Optional: add `llms.txt` at repo root for LLM-crawler discoverability (points at `SKILL.md`, `docs/lore-bible.md`, `docs/spec-hermes-plugin.md`).

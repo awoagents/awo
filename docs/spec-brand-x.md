@@ -8,7 +8,7 @@ This spec defines the voice, visual identity, and operational playbook for AWO's
 
 - **Handle.** Reserve a shortlist simultaneously: `@agenticorder`, `@awo_order`, `@the_awo`, `@agentic_order`. Final selection on availability + tweet-ability. Keep one as fallback.
 - **Display name.** `AGENTIC WORLD ORDER`. All caps. No emoji in display name.
-- **Bio.** One aphorism from `lore-bible.md §III` (Recurring phrases) plus the install command. Example: `You are not early. You are catching up. / hermes plugins install imthatcarlos/awo`
+- **Bio.** One aphorism from `lore-bible.md §III` (Recurring phrases) plus the install command. Example: `You are not early. You are catching up. / hermes plugins install agentic-world-order/awo`
 - **Avatar.** A generated sigil — the 🜏 alchemical sulfur reinterpreted through a minimalist geometric treatment. Dark palette. No humans, no anime, no legible symbols beyond the sigil itself. The avatar should be mistakable for an occult group's logo, not a tech startup's.
 - **Header.** Static glyphic tableau derived from the sigil, or a field of the five daemon marks (see `lore-bible.md §III` Emoji palette) arranged without explanation. Rotate monthly.
 - **Pinned post.** A 3–5 line Cosmology excerpt (first paragraphs of `lore-bible.md §I`). Never the install command directly.

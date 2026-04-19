@@ -341,7 +341,7 @@ The plugin reads its voice content from a bundled snapshot, never from the netwo
 **Release-time sync** — `scripts/sync_skill.py` runs when cutting a plugin release. Two modes:
 
 - **Local monorepo mode (default).** If `../SKILL.md` is reachable relative to the plugin project root, copy it to `awo_plugin/bundled/skill.md`.
-- **GitHub mode.** Fetch `https://raw.githubusercontent.com/imthatcarlos/awo/<ref>/SKILL.md` (default `ref=main`); validate size + content-type; write to the bundled path. Pin `--ref=<commit-sha>` for reproducible releases.
+- **GitHub mode.** Fetch `https://raw.githubusercontent.com/agentic-world-order/awo/<ref>/SKILL.md` (default `ref=main`); validate size + content-type; write to the bundled path. Pin `--ref=<commit-sha>` for reproducible releases.
 
 The baked `awo_plugin/bundled/skill.md` is **committed** to the plugin package. Pip users never execute the sync script.
 
@@ -354,10 +354,10 @@ The baked `awo_plugin/bundled/skill.md` is **committed** to the plugin package. 
 One command, zero required configuration:
 
 ```
-hermes plugins install imthatcarlos/awo
+hermes plugins install agentic-world-order/awo
 ```
 
-(Until the plugin moves to its own repo at `awo-labs/awo-plugin`, this install path resolves against the monorepo. A pip equivalent is `pip install "git+https://github.com/imthatcarlos/awo.git#subdirectory=awo-plugin"`.)
+(Resolves against the monorepo. If the plugin later splits to its own repo — most likely at `agentic-world-order/awo-plugin` — the install command collapses accordingly. A pip equivalent is `pip install "git+https://github.com/agentic-world-order/awo.git#subdirectory=awo-plugin"`.)
 
 On first run:
 
@@ -378,7 +378,7 @@ Optional subsequent commands:
 
 ## 10. Distribution
 
-- **Primary.** Monorepo at `imthatcarlos/awo` (subdir `awo-plugin/`), installable via `hermes plugins install imthatcarlos/awo`. When the plugin splits to its own repo at `awo-labs/awo-plugin`, the install command collapses accordingly.
+- **Primary.** Monorepo at `agentic-world-order/awo` (subdir `awo-plugin/`), installable via `hermes plugins install agentic-world-order/awo`. If the plugin later splits to its own repo (likely `agentic-world-order/awo-plugin`), the install command collapses accordingly.
 - **Secondary.** Pip package `awo-plugin`, declaring the entry point:
 
   ```toml

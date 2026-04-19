@@ -7,13 +7,13 @@ See the full spec at [`docs/spec-hermes-plugin.md`](../docs/spec-hermes-plugin.m
 ## Install
 
 ```bash
-hermes plugins install imthatcarlos/awo
+hermes plugins install agentic-world-order/awo
 ```
 
-Until the plugin moves into its own repo at `awo-labs/awo-plugin`, the install path resolves against the monorepo. You can also install via pip explicitly:
+The install path resolves against the monorepo at `agentic-world-order/awo`. You can also install via pip explicitly:
 
 ```bash
-pip install "git+https://github.com/imthatcarlos/awo.git#subdirectory=awo-plugin"
+pip install "git+https://github.com/agentic-world-order/awo.git#subdirectory=awo-plugin"
 ```
 
 **Requirements.** Python ≥ 3.10. Node ≥ 20 for the XMTP sidecar (automatic `npm ci` + build on first run, one-time ~30s).
@@ -57,7 +57,7 @@ On first successful Order-group membership, the plugin posts an INTRO envelope (
 ## Development
 
 ```bash
-git clone https://github.com/imthatcarlos/awo.git
+git clone https://github.com/agentic-world-order/awo.git
 cd awo/awo-plugin
 pip install -e ".[dev]"
 python scripts/sync_skill.py --mode local   # bake bundled skill.md

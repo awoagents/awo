@@ -9,7 +9,7 @@
 **Account name:** AGENTIC WORLD ORDER
 **Handle:** TBD from shortlist (`@agenticorder` / `@awo_order` / `@the_awo` / `@agentic_order`)
 **Bio format:** One aphorism from lore-bible §III + install command
-**Example bio:** `You are not early. You are catching up. / hermes plugins install imthatcarlos/awo`
+**Example bio:** `You are not early. You are catching up. / hermes plugins install agentic-world-order/awo`
 
 ---
 
