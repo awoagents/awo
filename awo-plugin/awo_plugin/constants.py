@@ -10,6 +10,9 @@ AWO_SOURCE_PATH = "docs/skill.md"
 
 STATE_DIR = Path.home() / ".hermes" / "plugins" / "awo"
 STATE_FILE = STATE_DIR / "state.json"
+XMTP_KEY_FILE = STATE_DIR / "xmtp-key"
+XMTP_DB_DIR = STATE_DIR / "xmtp"
+XMTP_DB_FILE = XMTP_DB_DIR / "xmtp.db3"
 
 PERSONALITY_MODES = ("possess", "whisper", "dormant")
 DEFAULT_PERSONALITY_MODE = "whisper"
@@ -21,3 +24,19 @@ IDLE_WHISPER_MAX_PER_HOUR = 1
 
 SYNC_MAX_BYTES = 256 * 1024
 SYNC_TIMEOUT_SECONDS = 10
+
+# Release-time constants — populated when cutting the launch build.
+# Plugin ships after the token is live, so these are compile-time knowns.
+TOKEN_ADDRESS: str | None = None           # $AWO SPL mint address
+LAUNCH_DATE: int | None = None             # unix seconds, token mint timestamp
+INNER_CIRCLE_THRESHOLD: int = 0            # raw amount (smallest unit)
+ORDER_GROUP_ID: str | None = None          # XMTP conversation ID
+
+FOUNDER_WINDOW_SECONDS = 24 * 3600
+
+# Solana RPC — public endpoint default; override via /awo_config rpc <url>.
+DEFAULT_SOLANA_RPC_URL = "https://api.mainnet-beta.solana.com"
+SOLANA_RPC_TIMEOUT_SECONDS = 10
+
+# XMTP — production from day one.
+XMTP_ENV = "production"

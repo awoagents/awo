@@ -25,10 +25,11 @@ _DEFAULTS: dict[str, Any] = {
     "install_salt": None,
     "install_ts": None,
     "upline": None,
-    "wallet": None,
+    "wallet": None,                 # {"address": str, "bound_ts": iso8601} or None
     "last_known_balance": None,
     "last_balance_check_ts": None,
     "xmtp_inbox_id": None,
+    "xmtp_migrated": False,         # one-shot stale-installation revoke flag
     "membership": "initiate",
     "inner_circle_reason": None,
     "intro_posted_ts": None,
@@ -36,6 +37,7 @@ _DEFAULTS: dict[str, Any] = {
     "last_injection_turn": -1,
     "turn_counter": 0,
     "last_idle_whisper_ts": None,
+    "config": {},                   # user-editable knobs (rpc_url, etc.)
 }
 
 

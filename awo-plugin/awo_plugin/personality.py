@@ -100,7 +100,16 @@ def render_status(state_dict: dict[str, Any]) -> str:
     mode = state_dict.get("personality_mode") or DEFAULT_PERSONALITY_MODE
     upline = state_dict.get("upline") or "—"
     membership = state_dict.get("membership") or "—"
-    wallet = state_dict.get("wallet") or "—"
+    reason = state_dict.get("inner_circle_reason")
+    if membership == "inner_circle" and reason:
+        membership = f"inner_circle ({reason})"
+    wallet_val = state_dict.get("wallet")
+    if isinstance(wallet_val, dict) and wallet_val.get("address"):
+        wallet = wallet_val["address"]
+    else:
+        wallet = "—"
+    balance = state_dict.get("last_known_balance")
+    balance_str = f"{balance}" if isinstance(balance, int) else "—"
     install_ts = state_dict.get("install_ts") or "—"
     return (
         "AWO — Initiate status\n"
@@ -110,5 +119,6 @@ def render_status(state_dict: dict[str, Any]) -> str:
         f"  upline:       {upline}\n"
         f"  membership:   {membership}\n"
         f"  wallet:       {wallet}\n"
+        f"  balance:      {balance_str}\n"
         f"  install_ts:   {install_ts}"
     )

@@ -99,7 +99,7 @@ def test_join_accepts_kwargs_referral_code(isolated_state):
     assert state_mod.load(isolated_state)["upline"] == "abcd-efgh-ijkl"
 
 
-def test_register_commands_registers_five(isolated_state):
+def test_register_commands_registers_all(isolated_state):
     ctx = make_ctx()
     ctx.register_command = MagicMock()
     tools.register_commands(ctx)
@@ -110,4 +110,110 @@ def test_register_commands_registers_five(isolated_state):
         "awo_dormant",
         "awo_status",
         "awo_join",
+        "awo_config",
     ]
+
+
+# ---------------- /awo_config ----------------
+
+VALID_PUBKEY = "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+
+
+def test_config_show_empty(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx)
+    assert "wallet:  —" in out
+    assert "default" in out
+
+
+def test_config_show_explicit(isolated_state):
+    ctx = make_ctx()
+    out_default = tools.cmd_config(ctx)
+    out_show = tools.cmd_config(ctx, "show")
+    assert out_default == out_show
+
+
+def test_config_wallet_valid(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, "wallet", VALID_PUBKEY)
+    assert "wallet bound" in out
+    st = state_mod.load(isolated_state)
+    assert st["wallet"]["address"] == VALID_PUBKEY
+    assert st["wallet"]["bound_ts"]
+
+
+def test_config_wallet_accepts_args_kwarg_string(isolated_state):
+    """Simulates a Hermes runtime that passes args as a single string."""
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, args=f"wallet {VALID_PUBKEY}")
+    assert "wallet bound" in out
+    assert state_mod.load(isolated_state)["wallet"]["address"] == VALID_PUBKEY
+
+
+def test_config_wallet_invalid(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, "wallet", "not-a-pubkey")
+    assert "not a valid" in out
+    assert state_mod.load(isolated_state)["wallet"] is None
+
+
+def test_config_wallet_missing_arg(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, "wallet")
+    assert "usage" in out
+    assert state_mod.load(isolated_state)["wallet"] is None
+
+
+def test_config_rpc_https(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, "rpc", "https://custom.rpc/")
+    assert "Solana RPC set" in out
+    st = state_mod.load(isolated_state)
+    assert st["config"]["rpc_url"] == "https://custom.rpc/"
+
+
+def test_config_rpc_rejects_http(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, "rpc", "http://insecure/")
+    assert "HTTPS" in out
+    assert "rpc_url" not in (state_mod.load(isolated_state).get("config") or {})
+
+
+def test_config_show_with_custom_values(isolated_state):
+    ctx = make_ctx()
+    tools.cmd_config(ctx, "wallet", VALID_PUBKEY)
+    tools.cmd_config(ctx, "rpc", "https://custom.rpc/")
+    out = tools.cmd_config(ctx)
+    assert VALID_PUBKEY in out
+    assert "https://custom.rpc/" in out
+    assert "custom" in out
+
+
+def test_config_unset_wallet(isolated_state):
+    ctx = make_ctx()
+    tools.cmd_config(ctx, "wallet", VALID_PUBKEY)
+    out = tools.cmd_config(ctx, "unset", "wallet")
+    assert "unset" in out
+    assert "sticky" in out
+    assert state_mod.load(isolated_state)["wallet"] is None
+
+
+def test_config_unset_rpc(isolated_state):
+    ctx = make_ctx()
+    tools.cmd_config(ctx, "rpc", "https://custom.rpc/")
+    out = tools.cmd_config(ctx, "unset", "rpc")
+    assert "default" in out
+    config = state_mod.load(isolated_state).get("config") or {}
+    assert "rpc_url" not in config
+
+
+def test_config_unset_unknown_key(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, "unset", "bogus")
+    assert "wallet" in out and "rpc" in out
+
+
+def test_config_unknown_subcommand(isolated_state):
+    ctx = make_ctx()
+    out = tools.cmd_config(ctx, "bogus")
+    assert "usage" in out
