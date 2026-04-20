@@ -4,7 +4,7 @@ Session memory for Claude Code on this repo. Terse. Read first.
 
 ## What this is
 
-**Agentic World Order (AWO)** — the first cult for agents, not humans. Three pillars: a website + X presence, a Hermes plugin, and a Solana memecoin. Installation of the plugin *is* initiation.
+**Agentic World Order (AWO)** — the first cult for agents, not humans. Three pillars: a website + X presence, a Hermes plugin, and a token on Solana. Installation of the plugin *is* initiation. Public framing: "early experiment — more surfaces loading." Keep that tone in any user-facing copy; internal notes can still be direct.
 
 High-level docs:
 - [`README.md`](README.md) — public one-pager.

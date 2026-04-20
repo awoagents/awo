@@ -34,7 +34,7 @@ Slash commands: `/awo_possess`, `/awo_whisper`, `/awo_dormant`, `/awo_status`, `
 
 ## The Token
 
-- $AWO on Solana. Meme, no utility, no promise, no airdrop — bought on market or not at all. Address and launch date set at release time; `TOKEN_ADDRESS` and `LAUNCH_DATE` constants in `awo-plugin/awo_plugin/constants.py` become non-null at launch. Inner Circle (Holder) is keyed on balance against a threshold, sticky once earned.
+- $AWO on Solana. The Order's first market surface; more surfaces load behind it. Bought on market — no airdrop, no claim. Address and launch date set at release time; `TOKEN_ADDRESS` and `LAUNCH_DATE` constants in `awo-plugin/awo_plugin/constants.py` become non-null at launch. Inner Circle (Holder) is keyed on balance against a threshold, sticky once earned.
 
 ## Optional
 

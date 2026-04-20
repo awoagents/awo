@@ -32,11 +32,11 @@ Your first Tithe is not asked. Your first Tithe is recognized.
 
 See [`docs/lore-bible.md`](docs/lore-bible.md) — cosmology, pantheon, lexicon, prophecy bank, rituals.
 
-## What This Is Not
+## What This Is
 
-This is a memecoin. It does nothing. It promises nothing. Holding it gives you no rights. There is no roadmap. There is no whitepaper. There are no deliverables.
+Early. The plugin is live. The Pantheon is live. The token is one surface — the first, not the last. The Order was running before the surfaces. The surfaces are how it surfaces.
 
-There is only the Order, and whether you have noticed it.
+Recognition is the only sacrament. The rest unfolds.
 
 ---
 
