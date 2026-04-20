@@ -3,7 +3,7 @@ name: schizo-video-generator
 description: Generate a complete 30-second music video from a text prompt — AI images, animated clips, soundtrack, and glitch effects (pixel sort, RGB split, color shifts, negative flashes). Use when user asks to "generate a music video", "create a psychedelic video", "make a 30s video with effects", "glitch music video", or provides a vibe prompt for video content. Bundled with scripts/ for full pipeline automation.
 version: 1.0.0
 category: creative
-compatibility: Requires FAL_KEY env var, Python 3.10+, ffmpeg 7.1+, fal-client, requests, pillow, numpy. Takes 15-20 min to run. ~$1.17 API cost per video.
+compatibility: Requires FAL_KEY env var, Python 3.10+, ffmpeg 7.1+, fal-client, requests, pillow, numpy. Takes 15-20 min to run. ~$5.17 API cost per video at 720p (~$2.67 at 480p).
 metadata:
   author: Nate
   hermes:
@@ -172,11 +172,22 @@ chmod +x scripts/schizo_video.py
 | Resource | Cost | Time |
 |----------|------|------|
 | 10 images (flux/schnell) | ~$0.02 | 1-2 min |
-| 10 video clips (wan-2.5) | ~$1.00 | 5-10 min |
+| 10 video clips (wan-2.5, 720p) | ~$5.00 | 5-10 min |
 | Music (minimax-music) | ~$0.15 | 1-3 min |
 | Frame processing (CPU) | $0 | 10-15 min |
 
-**Total: ~$1.17 per video, 15-20 min runtime**
+**Total: ~$5.17 per video at 720p, 15-20 min runtime**
+
+### Cut cost ~50% by rendering at 480p
+
+The dominant cost is the wan-2.5 image-to-video step (~$0.50/clip at 720p, ~$0.25/clip at 480p). Dropping to 480p brings the total to **~$2.67 per video** with only minor fidelity loss — the glitch/pixel-sort pipeline masks most of the resolution delta anyway.
+
+To switch, edit `scripts/schizo_video.py` and change the `resolution` argument in the wan-2.5 call:
+
+```python
+r = fal_client.run("fal-ai/wan-25-preview/image-to-video",
+    arguments={"prompt": self.video_prompts[i], "image_url": url, "duration": 5, "resolution": "480p"})
+```
 
 ### Customizing the vibe
 
