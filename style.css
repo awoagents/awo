@@ -214,7 +214,7 @@ body {
   position: fixed;
   left: 0; right: 0;
   height: 28px;
-  z-index: 12;
+  z-index: 30;
   background: var(--void);
   border-color: var(--border);
   color: var(--gold);
@@ -254,7 +254,7 @@ main {
   z-index: 20;
   max-width: 720px;
   margin: 0 auto;
-  padding: 5.5rem 1.75rem 3rem;
+  padding: 6.5rem 1.75rem 5rem;
 }
 
 /* readability safety net against bright webgl */
@@ -1295,7 +1295,7 @@ body.is-possessed .site-footer {
   .marquee { animation-duration: 45s; }
   .marquee-rev { animation-duration: 55s; }
 
-  main { padding: 4.5rem 1.25rem 2.25rem; }
+  main { padding: 5.25rem 1.25rem 3.75rem; }
 
   .hero-title { letter-spacing: 0.32em; font-size: 0.82rem; }
   .hero-subtitle { font-size: 0.56rem; letter-spacing: 0.25em; }
