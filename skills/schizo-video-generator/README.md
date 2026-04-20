@@ -1,15 +1,15 @@
 # Schizo Video Generator
 
-A skill for Claude that generates complete 30-second music videos from a single text prompt.
+A skill for Claude that generates complete 30-45 second music videos from a single text prompt.
 
 ![Example output](screenshot.png)
 
 ## What it does
 
 1. Generates 10 esoteric AI images from your vibe prompt
-2. Animates each into 5s video clips
-3. Creates a matching instrumental soundtrack
-4. Cuts everything into a 30s base video
+2. Animates each into a 2-7s video clip via `fal-ai/wan/v2.7/image-to-video` (variable per clip for natural pacing)
+3. Creates a matching instrumental soundtrack (minimax-music returns a 3-5 min track; it gets trimmed to video length in the final mix)
+4. Concatenates clips into a 30-45s base video (no trimming — clips are already the target length)
 5. Applies 8 layers of glitch effects:
    - Progressive pixel sorting (grows 30%→85% intensity)
    - RGB channel splitting + VHS tears
@@ -18,9 +18,9 @@ A skill for Claude that generates complete 30-second music videos from a single 
    - Psychedelic color shifts
    - Negative flashes with color tints
 
-**Cost:** ~$5.17 per video at 720p (~$2.67 at 480p)  
+**Cost:** ~$4.67 per video at 1080p (wan/v2.7 is $0.10/sec × 45s default — scales linearly with total clip duration)  
 **Runtime:** 15-20 minutes  
-**Output:** 1280x720 @ 30fps, 84MB MP4
+**Output:** 1920x1080 @ 30fps MP4
 
 ## Quick start
 

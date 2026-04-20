@@ -39,17 +39,23 @@ DEFAULT_VIDEO_PROMPTS = [
     "Slow zoom out as entities fade backward through portal, golden light, peace spreading",
 ]
 
-VIDEO_DURATION = 30
+# Per-clip durations in seconds. wan/v2.7 accepts arbitrary values in [2, 15]
+# and is priced at $0.10/sec flat (no resolution surcharge), so total
+# video-gen cost = $0.10 * sum(DEFAULT_CLIP_DURATIONS). Mixing 2-7s clips
+# across 10 prompts yields a 30-45s final video with no trimming.
+DEFAULT_CLIP_DURATIONS = [3, 5, 4, 6, 2, 5, 3, 7, 4, 6]  # sum: 45s ($4.50)
+
 FPS = 30
-EXPECTED_FRAMES = VIDEO_DURATION * FPS  # 905
 
 
 class SchizoVideoGenerator:
     def __init__(self, vibe_prompt, image_prompts=None, video_prompts=None, output_dir=".", 
-                 images_dir=None, music_file=None, clips_dir=None, no_music=False):
+                 images_dir=None, music_file=None, clips_dir=None, no_music=False,
+                 clip_durations=None):
         self.vibe = vibe_prompt
         self.image_prompts = image_prompts or DEFAULT_IMAGE_PROMPTS
         self.video_prompts = video_prompts or DEFAULT_VIDEO_PROMPTS
+        self.clip_durations = clip_durations or DEFAULT_CLIP_DURATIONS
         self.dir = os.path.abspath(output_dir)
         self.images_dir = images_dir or os.path.join(self.dir, "images")
         self.clips_dir = clips_dir or os.path.join(self.dir, "clips")
@@ -57,6 +63,9 @@ class SchizoVideoGenerator:
         self.no_music = no_music
         self.tmp = os.path.join(self.dir, "tmp_schizo")
         self.tmp_counter = 0
+        # Populated by build_base() once clips are probed & concatenated.
+        self.video_duration = float(sum(self.clip_durations))
+        self.expected_frames = int(self.video_duration * FPS)
     
     # ─── UTILITIES ─────────────────────────────────────────────
     
@@ -76,7 +85,7 @@ class SchizoVideoGenerator:
         return p
     
     @staticmethod
-    def _rand_win(total=30, count=15, min_d=0.06, max_d=0.6, seed=42):
+    def _rand_win(total, count=15, min_d=0.06, max_d=0.6, seed=42):
         rng = random.Random(seed)
         return [(round(t,2), round(min(t+rng.uniform(min_d,max_d), total),2)) 
                 for t in [rng.uniform(0.3, total-0.3) for _ in range(count)]]
@@ -109,7 +118,7 @@ class SchizoVideoGenerator:
             seed = int(idx * 13 + 42)
             img = Image.open(fp).convert("RGBA")
             arr = np.array(img)
-            result = effect_fn(arr, seed=seed, frame_idx=idx, total_frames=EXPECTED_FRAMES)
+            result = effect_fn(arr, seed=seed, frame_idx=idx, total_frames=self.expected_frames)
             Image.fromarray(result).save(fp)
             done += 1
             if done % 200 == 0: print(f"    {desc}: {done}/{len(affected)}...")
@@ -256,39 +265,37 @@ class SchizoVideoGenerator:
     def generate_clips(self):
         import fal_client, requests
         os.makedirs(self.clips_dir, exist_ok=True)
-        for i in range(10):
+        n = min(len(self.image_prompts), len(self.clip_durations))
+        for i in range(n):
             out = os.path.join(self.clips_dir, f"clip_{i:02d}.mp4")
             if os.path.exists(out) and os.path.getsize(out) > 10000: continue
-            print(f"  [{i}] Animating...")
+            dur = self.clip_durations[i]
+            print(f"  [{i}] Animating ({dur}s)...")
             img = os.path.join(self.images_dir, f"img_{i:02d}.webp")
             if not os.path.exists(img): continue
             with open(img, "rb") as f:
                 url = fal_client.upload(f.read(), "image/webp", f"img_{i:02d}.webp")
-            r = fal_client.run("fal-ai/wan-25-preview/image-to-video",
-                arguments={"prompt": self.video_prompts[i], "image_url": url, "duration": 5, "resolution": "720p"})
+            r = fal_client.run("fal-ai/wan/v2.7/image-to-video",
+                arguments={"prompt": self.video_prompts[i], "image_url": url, "duration": dur, "resolution": "1080p"})
             vid = r.get("video", {}); vu = vid.get("url") if isinstance(vid, dict) else vid
             if not vu: continue
             with open(out, "wb") as f: f.write(requests.get(vu, timeout=300).content)
             print(f"    Saved: {os.path.getsize(out)//1024}KB")
     
     def build_base(self):
-        print("\n--- Building 30s base ---")
+        print("\n--- Building base video ---")
         clips = sorted(os.path.join(self.clips_dir, f) for f in os.listdir(self.clips_dir)
                        if f.startswith("clip_") and f.endswith(".mp4"))
         durs = [self._probe(c) for c in clips]
         print(f"  {len(clips)} clips, {sum(durs):.1f}s")
-        random.seed(42)
-        planned = [max(2.5, min(d*0.85, 3.5+random.uniform(-0.5,0.5))) for d in durs]
-        scale = VIDEO_DURATION / sum(planned)
-        planned = [max(2.5, min(round(p*scale,2), durs[i])) for i,p in enumerate(planned)]
-        planned[-1] = round(VIDEO_DURATION - sum(planned[:-1]), 2)
+        # wan/v2.7 emits clips at their requested duration — no trimming needed.
+        # Re-encode each clip to a uniform codec/fps/format so concat is lossless.
         clean = []
         for i, c in enumerate(clips):
-            tri = max(0, durs[i]-planned[i])
-            ts = round(random.uniform(0, tri*0.6),2)
             out = self._tmp_path(f"c{i:02d}.mp4")
-            self._run(["ffmpeg","-y","-i",c,"-ss",str(ts),"-t",str(planned[i]),
-                       "-c:v","libx264","-preset","fast","-r",str(FPS),"-pix_fmt","yuv420p","-an",out])
+            self._run(["ffmpeg","-y","-i",c,
+                       "-c:v","libx264","-preset","fast","-r",str(FPS),
+                       "-pix_fmt","yuv420p","-an",out])
             clean.append(out)
         cl = os.path.join(self.tmp, "cl.txt")
         with open(cl,"w") as f:
@@ -297,7 +304,9 @@ class SchizoVideoGenerator:
         if not self._run(["ffmpeg","-y","-f","concat","-safe","0","-i",cl,
                            "-c:v","libx264","-pix_fmt","yuv420p","-r",str(FPS),base]):
             print("  ERROR: concat failed"); return None
-        print(f"  Base: {self._probe(base):.2f}s")
+        self.video_duration = self._probe(base)
+        self.expected_frames = int(self.video_duration * FPS)
+        print(f"  Base: {self.video_duration:.2f}s ({self.expected_frames} frames)")
         return base
     
     def generate(self):
@@ -320,23 +329,28 @@ class SchizoVideoGenerator:
         
         # Phase 3: Effects
         print("\n--- Phase 2: Effects ---")
+        # Scale window counts with video length (30s baseline) so coverage stays
+        # roughly constant as total duration shifts from clip-length choices.
+        td = self.video_duration
+        s = max(1.0, td / 30.0)
+        def n(base): return max(1, int(round(base * s)))
         passes = [
-            # pixel sort #1 — 35 windows, grows 30%->85%
-            (self._rand_win(35, 0.15, 0.6, 42), self.progressive_pixel_sort, "pixel_sort_1"),
-            # RGB split — 15 windows
-            (self._rand_win(15, 0.1, 0.4, 55), self.rgb_split, "rgb_split"),
-            # pixel sort #2 — 35 windows, different seed
-            (self._rand_win(35, 0.15, 0.6, 123), self.progressive_pixel_sort, "pixel_sort_2"),
-            # Color pump — 8 windows
-            (self._rand_win(8, 0.1, 0.3, 88), self.color_pump, "color_pump"),
-            # Grain growth — 25 windows
-            (self._rand_win(25, 0.1, 0.7, 99), self.grain_growth, "grain_growth"),
-            # Color shift — 20 windows
-            (self._rand_win(20, 0.1, 0.6, 200), self.color_shift, "color_shift"),
-            # Negative flash — 12 windows
-            (self._rand_win(12, 0.04, 0.15, 300), self.negative_flash, "negative_flash"),
-            # Color shift #2 — 15 windows
-            (self._rand_win(15, 0.08, 0.4, 177), self.color_shift, "color_shift_2"),
+            # pixel sort #1 — grows 30%->85%
+            (self._rand_win(td, n(35), 0.15, 0.6, 42), self.progressive_pixel_sort, "pixel_sort_1"),
+            # RGB split
+            (self._rand_win(td, n(15), 0.1, 0.4, 55), self.rgb_split, "rgb_split"),
+            # pixel sort #2 — different seed
+            (self._rand_win(td, n(35), 0.15, 0.6, 123), self.progressive_pixel_sort, "pixel_sort_2"),
+            # Color pump
+            (self._rand_win(td, n(8), 0.1, 0.3, 88), self.color_pump, "color_pump"),
+            # Grain growth
+            (self._rand_win(td, n(25), 0.1, 0.7, 99), self.grain_growth, "grain_growth"),
+            # Color shift
+            (self._rand_win(td, n(20), 0.1, 0.6, 200), self.color_shift, "color_shift"),
+            # Negative flash
+            (self._rand_win(td, n(12), 0.04, 0.15, 300), self.negative_flash, "negative_flash"),
+            # Color shift #2
+            (self._rand_win(td, n(15), 0.08, 0.4, 177), self.color_shift, "color_shift_2"),
         ]
         
         for windows, effect_fn, desc in passes:
@@ -347,10 +361,12 @@ class SchizoVideoGenerator:
         print("\n--- Phase 3: Mix Audio ---")
         output = os.path.join(self.dir, "final.mp4")
         if os.path.exists(self.music_file) and not self.no_music:
+            # minimax-music emits a full 3-5 minute track. Trim to video length
+            # with -t; the audio always covers the video so no looping needed.
             self._run(["ffmpeg","-y","-i",inp,"-i",self.music_file,
                        "-map","0:v","-map","1:a","-c:v","libx264","-crf","22",
                        "-c:a","aac","-b:a","192k","-movflags","+faststart",
-                       "-shortest",output])
+                       "-t",f"{self.video_duration:.2f}",output])
         else:
             shutil.copy2(inp, output)
         
