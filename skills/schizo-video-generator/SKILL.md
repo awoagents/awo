@@ -95,6 +95,8 @@ The final video is composited with the generated soundtrack.
 
 Edit `DEFAULT_IMAGE_PROMPTS` and `DEFAULT_VIDEO_PROMPTS` arrays in `scripts/schizo_video.py` to match your desired aesthetic.
 
+For reference aesthetics, see `media/moodboard/` at the repo root — it contains the canonical AWO visual vocabulary (occult geometry, dark gothic cathedrals, ceremonial magic circles, post-internet glitch, terminal/hacker occultism, chibi conspiracy mascots, daemon sigils, gold-on-black color palette, etc.). Describe those images in prose and feed the descriptions into `DEFAULT_IMAGE_PROMPTS` to keep generations on-brand.
+
 ### Adjust effect intensity
 
 In the `generate()` method, modify effect pass parameters:
