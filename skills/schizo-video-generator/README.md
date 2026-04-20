@@ -2,7 +2,7 @@
 
 A skill for Claude that generates complete 30-second music videos from a single text prompt.
 
-![Example output](screenshot-here.png)
+![Example output](screenshot.png)
 
 ## What it does
 
@@ -18,7 +18,7 @@ A skill for Claude that generates complete 30-second music videos from a single 
    - Psychedelic color shifts
    - Negative flashes with color tints
 
-**Cost:** ~$1.17 per video  
+**Cost:** ~$5.17 per video at 720p (~$2.67 at 480p)  
 **Runtime:** 15-20 minutes  
 **Output:** 1280x720 @ 30fps, 84MB MP4
 
