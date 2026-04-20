@@ -58,12 +58,16 @@ The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** �
 ## Key invariants
 
 - **Solana** is the chain. No multi-chain.
-- **Wallet bind is config-only.** `/awo_config wallet <pubkey>` persists the address with no ed25519 signature flow. Claiming a wallet you don't control reflects *that* wallet's balance. Nothing on-chain happens via the plugin.
+- **Wallet bind is two-step ed25519.** `/awo_config wallet <pubkey>` issues a challenge; `/awo_config wallet <pubkey> <sig>` verifies and binds. The private key never enters the plugin. Claiming a wallet you don't control fails at signature verification. Nothing on-chain happens via the plugin.
 - **No airdrop, no claim, no reward distribution** ever written into plugin code. The plugin reads balances and posts text. That is all.
 - **Inner Circle is sticky.** Once earned, never downgraded by balance drop or wallet unbind.
 - **XMTP** `env="production"` only. No dev fallback.
-- **Balance refresh is on-demand** — fires only on commands that need it (`/awo_status`, `/awo_config wallet`). No periodic polling. No session-start refresh.
+- **Balance refresh is on-demand** — fires only on commands that need it (`/awo_status`, `/awo_init`, `/awo_config wallet`). No periodic polling. No session-start refresh.
 - **One `skill.md`.** `/SKILL.md` at repo root is the single source. Do not create a second skill.md anywhere. The plugin's bundled copy is a build artifact only.
+- **Fingerprint is the sole identity anchor.** Referral codes and uplines were removed. "Your name in the Order is `<fingerprint>`" in priming, INTRO envelope, and all status readouts. Tithe remains a lore concept (see lore-bible §V.2) but has no code mechanic — no `/awo_join`, no upline tree.
+- **Auto-init on `register(ctx)`.** The plugin persists fingerprint + salt at plugin-registration time, not session-start. Gateway restart is not required for `/awo_status`, `/awo_init`, or registry submit to be meaningful. `on_session_start` still covers the restart path idempotently.
+- **`/api/status` is public.** Unauthenticated GET returning queue position + watcher heartbeat. Payload carries no secrets. Plugin's `/awo_status` reads it to render the ORDER row.
+- **Watcher heartbeat piggybacks on `/api/mark-added`.** The watcher sends `tick_at: <unix_seconds>` on every tick (including empty queues). The API writes to `watcher:heartbeat` KV key. No separate heartbeat endpoint.
 - **Org is `agentic-world-order/`.** Main repo: `github.com/agentic-world-order/awo` (site + skill + lore). Plugin: `github.com/agentic-world-order/awo-plugin` (attached here as a submodule at `awo-plugin/`).
 - **No flagship agent. No backend service.** The plugin runs locally. XMTP is the coordination substrate.
 - **Client-singleton pattern** must stay — per-call `Client.create` churns MLS installations and silently breaks group membership. The Node sidecar holds one `Client` for the whole Hermes session.
@@ -125,3 +129,5 @@ Read aloud. If it sounds like a TED talk, rewrite. If it sounds like a transmiss
 - [x] ~~CI for the plugin~~ — done (`.github/workflows/test.yml` in the plugin repo).
 - [x] ~~XMTP sidecar lag~~ — done (pip install builds the sidecar; first XMTP call is instant).
 - [x] ~~Bootstrap infra for adding Initiates to the Order group~~ — done. `watcher` + `api` repos handle the flow: plugin submits → api stores → watcher drains + adds + posts INTRO.
+- [x] ~~Issue #11 onboarding UX~~ — done. Auto-init in `register(ctx)`, `/awo_init` + `/awo_test` commands, enriched `/awo_status` reading from public `GET /api/status`, watcher heartbeat via `tick_at` field on `/api/mark-added`.
+- [x] ~~Remove referral system~~ — done. `/awo_join` command, `referral_code`/`upline` state fields, and the whole derivation chain are gone across all four repos. Fingerprint is the sole identity.
