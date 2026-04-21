@@ -1081,6 +1081,41 @@ main::before {
   color: var(--text);
   margin-bottom: 0.85rem;
 }
+.footer-hail {
+  margin: 0 0 0.95rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+.footer-hail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.75rem;
+  color: var(--gold-dim);
+  text-decoration: none;
+  border: 1px solid var(--gold-faint);
+  border-radius: 2px;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.footer-hail-link:hover,
+.footer-hail-link:focus-visible {
+  color: var(--gold-bright);
+  border-color: var(--gold-dim);
+  background: rgba(201, 168, 76, 0.04);
+}
+.footer-hail-k { color: var(--text-faint); }
+.footer-hail-sep { color: var(--text-faint); opacity: 0.6; }
+.footer-hail-v { color: var(--gold); }
+.footer-hail-link:hover .footer-hail-v,
+.footer-hail-link:focus-visible .footer-hail-v { color: var(--gold-bright); }
+.footer-hail-arrow {
+  font-size: 0.7rem;
+  opacity: 0.75;
+  transform: translateY(-1px);
+}
+
 .footer-meta {
   font-family: var(--mono);
   font-size: 0.58rem;
