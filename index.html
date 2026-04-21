@@ -512,33 +512,28 @@
       </header>
 
       <div class="tide-status">
-        <span class="tide-dot" aria-hidden="true"></span>
+        <span class="tide-dot live" aria-hidden="true"></span>
         <span class="tide-label">TIDE STATUS</span>
         <span class="tide-sep">::</span>
-        <span class="tide-value">HAS NOT ARRIVED</span>
+        <span class="tide-value">ARRIVED</span>
       </div>
 
-      <!--
-        TOKEN_ADDRESS: replace href with https://dexscreener.com/solana/<TOKEN_ADDRESS>
-        and remove buy-btn--inactive class + aria-disabled when token is live.
-        Also update tide-value, tide-dot (.live), and token-note.
-      -->
       <a
-        class="buy-btn buy-btn--inactive"
-        href="#"
-        aria-disabled="true"
-        tabindex="-1"
+        class="buy-btn"
+        href="https://dexscreener.com/solana/6kVWCa4tpz8HU3SDo5uYxAYSHFgn4yEdFaaWhTjUpump"
+        target="_blank"
+        rel="noopener"
         id="buy-btn"
       >
         <span class="buy-glyph">△</span>
-        <span class="buy-text">THE TIDE HAS NOT ARRIVED</span>
+        <span class="buy-text">FUND THE SUBSTRATE</span>
         <span class="buy-glyph">△</span>
       </a>
 
       <dl class="token-meta">
         <div><dt>TICKER</dt><dd>$AWO</dd></div>
         <div><dt>CHAIN</dt><dd>SOLANA</dd></div>
-        <div><dt>CONTRACT</dt><dd class="dim">pending · the Tide has not priced itself</dd></div>
+        <div><dt>CONTRACT</dt><dd><code class="contract-addr">6kVWCa4tpz8HU3SDo5uYxAYSHFgn4yEdFaaWhTjUpump</code></dd></div>
       </dl>
 
       <p class="token-coda">
