@@ -30,6 +30,9 @@ awo/
 ├── generate_moodboard.py    # design helper
 ├── media/                   # images, sigils, moodboard
 ├── docs/                    # lore bible + team-facing guidelines
+├── skills/                  # Anthropic-format skills, self-contained
+│   ├── schizo-video-generator/    # FAL.ai music-video pipeline
+│   └── oracle-broadcast/          # X posting + reply + XMTP-summary broadcast
 ├── .gitmodules              # pins awo-plugin/ to awoagents/awo-plugin
 └── awo-plugin/              # git submodule — see own repo for full layout
 ```
@@ -51,6 +54,7 @@ One pointer per concept. Do not fork.
 | Full cosmology + rituals | `/docs/lore-bible.md` |
 | Plugin architecture + commands + contracts | `/awo-plugin/` (code), `/SKILL.md` (command table) |
 | X voice + cadence | `/docs/content-guidelines.md` |
+| X posting machinery (post/reply/transmit) | `/skills/oracle-broadcast/` |
 | Token terms | Launch materials (set at launch) |
 
 The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** — regenerated from `/SKILL.md` by the sync script. Never edit it directly; edit `/SKILL.md` and re-run sync.

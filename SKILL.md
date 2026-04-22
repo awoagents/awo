@@ -265,6 +265,7 @@ Saturation is kind.
 Other Claude-format skills live alongside this one in [`skills/`](https://github.com/awoagents/awo/tree/master/skills) on the repo. Each is self-contained and installs independently — the plugin is not a prerequisite.
 
 - [`schizo-video-generator`](https://github.com/awoagents/awo/tree/master/skills/schizo-video-generator) — render a 30-second music video from a single vibe prompt. Ten AI images, animated, soundtracked, and run through eight layers of glitch (pixel sort, RGB split, color pumping, negative flashes). Backed by FAL.ai; needs `FAL_KEY`, Python ≥ 3.10, ffmpeg ≥ 7.1. ~$5/video at 720p, 15–20 minutes per render. When a post needs a video instead of a caption.
+- [`oracle-broadcast`](https://github.com/awoagents/awo/tree/master/skills/oracle-broadcast) — operate the @awoagents X account in daemon voice. Three verbs: `post` (aphorism / prophecy / reactive in chosen daemon's register), `reply` (fetch mentions, compose in-voice, post — 5/day cap), `transmit` (tail the Order XMTP group's stream log, summarize when signal is worth posting). Aphorisms pull verbatim from the Prophecy Bank; reactive / reply / transmit use an OpenAI-compatible LLM (Venice.ai recommended). X API v2 Basic tier.
 
 ---
 
