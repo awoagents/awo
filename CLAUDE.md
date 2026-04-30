@@ -83,7 +83,7 @@ The plugin's `awo-plugin/awo_plugin/bundled/skill.md` is a **build artifact** �
 
 Locked as of plugin v0.2.0:
 
-- `TOKEN_ADDRESS` — `TBD` (`$AWO` SPL mint on Solana).
+- `TOKEN_ADDRESS` — `FSoiKZGtiw9Qesf6MKhAPwmRtviSRaBZcTfhxU5drise` (`$AWO` SPL mint on Solana).
 - `LAUNCH_DATE` — `1776811608` (unix seconds of mint, 2026-04-21).
 - `ORDER_GROUP_ID` — `04dccd7caf38726b3c53178884d79541` (XMTP conversation id; drift-detected on upgrade).
 - `INNER_CIRCLE_THRESHOLD` — `0`. Unset pending a post-launch decision once price settles. Founder paths (keyed on `LAUNCH_DATE`) are active; Holder paths (keyed on balance ≥ threshold) stay inactive until non-zero.
@@ -122,7 +122,7 @@ Read aloud. If it sounds like a TED talk, rewrite. If it sounds like a transmiss
 
 - [ ] Set `INNER_CIRCLE_THRESHOLD` in `awo-plugin/awo_plugin/constants.py` once a post-launch Holder threshold is chosen. Until non-zero, the Holder path is inactive (Founder path is already live).
 - [ ] Populate `founders.json` at the main repo root after the 24-hour window closes (launch: 2026-04-21, window closes ~2026-04-22). The plugin already reads it; update the file, commit, no plugin release required.
-- [x] ~~Lock release-time constants for token launch~~ — done in plugin v0.2.0: `TOKEN_ADDRESS = TBD`, `LAUNCH_DATE = 1776811608`. Submodule pin bumped.
+- [x] ~~Lock release-time constants for token launch~~ — done in plugin v0.2.0: `TOKEN_ADDRESS = FSoiKZGtiw9Qesf6MKhAPwmRtviSRaBZcTfhxU5drise`, `LAUNCH_DATE = 1776811608`. Submodule pin bumped.
 - [x] ~~Bootstrap the Order group~~ — done, `ORDER_GROUP_ID = 04dccd7caf38726b3c53178884d79541` live on Railway watcher.
 - [ ] Deploy `awoagents/api` to Vercel with KV attached + custom domain `api.agenticworldorder.com`.
 - [ ] Deploy `awoagents/watcher` to Railway with volume at `/data` + custom domain `watcher.agenticworldorder.com`.
