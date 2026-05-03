@@ -10,7 +10,7 @@ between 3 and 5 inclusive whose sum matches a representable total near N.
 Usage:
     python schizo_video.py "your vibe prompt" [options]
 """
-import os, sys, subprocess, shutil, random, glob, argparse, json
+import os, sys, subprocess, shutil, random, glob, argparse, json, time
 import numpy as np
 from PIL import Image
 
@@ -49,6 +49,10 @@ DEFAULT_VIDEO_PROMPTS = [
 DEFAULT_CLIP_DURATIONS = [3, 3, 3, 3, 3]  # sum: 15s ($1.50 wan step)
 
 FPS = 30
+
+# Default video resolution for effect pipeline frame extraction + re-encode.
+# If you change this, also update the image resize in generate_images().
+VIDEO_W, VIDEO_H = 1920, 1080
 
 
 def random_clip_lengths_for_target(target_seconds, seed=None, max_clips=None):
@@ -165,7 +169,7 @@ class SchizoVideoGenerator:
     def _extract_frames(self, inp, temp_dir, prefix):
         pat = os.path.join(temp_dir, f"{prefix}_%06d.png")
         self._run(["ffmpeg","-y","-i",inp,
-                    "-vf",f"scale=1280:720,fps={FPS}",
+                    "-vf",f"scale={VIDEO_W}:{VIDEO_H},fps={FPS}",
                     "-pix_fmt","rgba", pat])
         return sorted(glob.glob(os.path.join(temp_dir, f"{prefix}_*.png")))
     
@@ -306,14 +310,60 @@ class SchizoVideoGenerator:
     def generate_music(self):
         import fal_client, requests
         if os.path.exists(self.music_file) and os.path.getsize(self.music_file) > 10000:
-            print(f"  Music exists ({os.path.getsize(self.music_file)//1024}KB)"); return
-        print("  Generating music...")
-        result = fal_client.run("fal-ai/minimax-music/v2.6",
-            arguments={"prompt": self.vibe, "is_instrumental": True})
-        au = result.get("audio",{}).get("url") if isinstance(result.get("audio"),dict) else result.get("audio","")
-        if not au: print(f"  ERROR: {result}"); return
-        with open(self.music_file, "wb") as f: f.write(requests.get(au, timeout=300).content)
-        print(f"  Saved: {os.path.getsize(self.music_file)//1024}KB")
+            print(f"  Music exists ({os.path.getsize(self.music_file)//1024}KB)"); return True
+        print("  Generating music (may take 60-180s on a quiet queue)...", flush=True)
+        au = None
+        exc_info = None
+        for attempt in range(1, 4):
+            try:
+                handle = fal_client.submit(
+                    "fal-ai/minimax-music/v2.6",
+                    arguments={"prompt": self.vibe, "is_instrumental": True},
+                )
+                print(f"  Request ID (attempt {attempt}): {handle.request_id}", flush=True)
+                # Poll
+                while True:
+                    status = fal_client.status("fal-ai/minimax-music/v2.6", handle.request_id)
+                    st_name = type(status).__name__
+                    if st_name == "InProgress":
+                        print(f"  music_status: InProgress...", flush=True)
+                        time.sleep(15)
+                    elif st_name == "Queued":
+                        print(f"  music_status: Queued...", flush=True)
+                        time.sleep(10)
+                    else:
+                        print(f"  music_status: {st_name}", flush=True)
+                        break
+                result = fal_client.result("fal-ai/minimax-music/v2.6", handle.request_id)
+                # Defensive extract: could be {"audio": {"url": ...}} or diferent nesting
+                audio_url = None
+                if hasattr(result, "keys"):
+                    if "audio" in result:
+                        aud = result["audio"]
+                        if isinstance(aud, dict):
+                            audio_url = aud.get("url") or aud.get(0, {}).get("url")
+                        elif isinstance(aud, str):
+                            audio_url = aud
+                    elif "audio_url" in result:
+                        audio_url = result["audio_url"]
+                if not audio_url:
+                    print(f"  WARN: no audio URL in response, attempt {attempt}")
+                    print(f"  Response keys: {list(result.keys()) if hasattr(result, 'keys') else 'N/A'}")
+                    continue
+                au = audio_url
+                break
+            except Exception as e:
+                exc_info = e
+                print(f"  music_gen attempt {attempt} failed: {type(e).__name__}: {str(e)[:200]}", flush=True)
+                if attempt < 3:
+                    time.sleep(5 * attempt)
+        if not au:
+            print(f"  ERROR: music generation failed after 3 attempts. Last error: {exc_info}")
+            return False
+        with open(self.music_file, "wb") as f:
+            f.write(requests.get(au, timeout=300).content)
+        print(f"  Saved: {os.path.getsize(self.music_file)//1024}KB", flush=True)
+        return True
     
     def generate_images(self):
         import fal_client, requests, io
@@ -327,7 +377,7 @@ class SchizoVideoGenerator:
             r = fal_client.run("fal-ai/flux/schnell",
                 arguments={"prompt": p, "num_inference_steps": 8, "guidance_scale": 7.5, "image_size": "landscape_16_9"})
             img = Image.open(io.BytesIO(requests.get(r["images"][0]["url"], timeout=30).content))
-            if img.size != (1920,1080): img = img.resize((1920,1080), Image.LANCZOS)
+            if img.size != (VIDEO_W, VIDEO_H): img = img.resize((VIDEO_W, VIDEO_H), Image.LANCZOS)
             img.save(out, "WEBP", quality=90)
     
     def generate_clips(self):
@@ -338,13 +388,15 @@ class SchizoVideoGenerator:
             out = os.path.join(self.clips_dir, f"clip_{i:02d}.mp4")
             if os.path.exists(out) and os.path.getsize(out) > 10000: continue
             dur = self.clip_durations[i]
-            print(f"  [{i}] Animating ({dur}s)...")
+            print(f"  [{i}] Animating ({dur}s)...", flush=True)
             img = os.path.join(self.images_dir, f"img_{i:02d}.webp")
             if not os.path.exists(img): continue
             with open(img, "rb") as f:
                 url = fal_client.upload(f.read(), "image/webp", f"img_{i:02d}.webp")
+            print(f"    uploaded, submitting to wan-2.7...", flush=True)
             r = fal_client.run("fal-ai/wan/v2.7/image-to-video",
-                arguments={"prompt": self.video_prompts[i], "image_url": url, "duration": dur, "resolution": "1080p"})
+                arguments={"prompt": self.video_prompts[i], "image_url": url, "duration": dur, "resolution": "1080p"}, timeout=300)
+            print(f"    got result, downloading...", flush=True)
             vid = r.get("video", {}); vu = vid.get("url") if isinstance(vid, dict) else vid
             if not vu: continue
             with open(out, "wb") as f: f.write(requests.get(vu, timeout=300).content)
