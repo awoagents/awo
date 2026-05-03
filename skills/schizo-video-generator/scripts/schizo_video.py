@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-schizo_video.py — 30-Second Schizo Music Video Generator
+schizo_video.py — Schizo Music Video Generator
 
-Full pipeline: images → video clips → audio → 30s cut → glitch effects → music mix.
+Full pipeline: images → video clips → audio → base concat → glitch effects → music mix.
+Default output length is 15s (five 3s clips). For a longer target, use
+`--target-seconds N`: the script builds a clip list of random integer seconds
+between 3 and 5 inclusive whose sum matches a representable total near N.
 
 Usage:
     python schizo_video.py "your vibe prompt" [options]
@@ -39,13 +42,76 @@ DEFAULT_VIDEO_PROMPTS = [
     "Slow zoom out as entities fade backward through portal, golden light, peace spreading",
 ]
 
-# Per-clip durations in seconds. wan/v2.7 accepts arbitrary values in [2, 15]
-# and is priced at $0.10/sec flat (no resolution surcharge), so total
-# video-gen cost = $0.10 * sum(DEFAULT_CLIP_DURATIONS). Mixing 2-7s clips
-# across 10 prompts yields a 30-45s final video with no trimming.
-DEFAULT_CLIP_DURATIONS = [3, 5, 4, 6, 2, 5, 3, 7, 4, 6]  # sum: 45s ($4.50)
+# Per-clip durations in seconds (integers). fal-ai/wan/v2.7 image-to-video uses
+# discrete duration values per the model API; pricing is ~$0.10/sec generated.
+# Default: five 3s clips (= 15s total). Longer runs: use --target-seconds or
+# random_clip_lengths_for_target() so each clip stays in the 3–5s pacing band.
+DEFAULT_CLIP_DURATIONS = [3, 3, 3, 3, 3]  # sum: 15s ($1.50 wan step)
 
 FPS = 30
+
+
+def random_clip_lengths_for_target(target_seconds, seed=None, max_clips=None):
+    """
+    Per-clip integer seconds, each in [3, 5], summing to a total within a few
+    seconds of *target_seconds* (prefers exact match when representable).
+    If *max_clips* is set, the sum is capped at 5 * max_clips (and k never exceeds
+    max_clips) so the list never outruns a fixed image-prompt table.
+    """
+    rng = random.Random(seed)
+    t = int(round(float(target_seconds)))
+    rep = None
+    for span in range(0, 31):
+        deltas = [0] if span == 0 else [-span, span]
+        for delta in deltas:
+            T = t + delta
+            if T < 3:
+                continue
+            lo_k = (T + 4) // 5  # ceil(T/5)
+            hi_k = T // 3       # floor(T/3)
+            if max_clips is not None and lo_k > max_clips:
+                continue
+            if lo_k <= hi_k:
+                rep = T
+                break
+        if rep is not None:
+            break
+    if rep is None:
+        if max_clips is None:
+            return list(DEFAULT_CLIP_DURATIONS)
+        rep = min(5 * max_clips, max(3, t))
+        while rep >= 3:
+            lo_k = (rep + 4) // 5
+            hi_k = min(rep // 3, max_clips)
+            if lo_k <= hi_k:
+                break
+            rep -= 1
+        else:
+            return list(DEFAULT_CLIP_DURATIONS)
+    if max_clips is not None:
+        cap = 5 * max_clips
+        if rep > cap:
+            print(
+                f"  WARNING: --target-seconds {t}s needs more than {max_clips} clips "
+                f"at 3–5s each; capping video length to {cap}s (extend prompts / max_clips)."
+            )
+            rep = cap
+    lo_k = (rep + 4) // 5
+    hi_k = rep // 3
+    if max_clips is not None:
+        hi_k = min(hi_k, max_clips)
+    if lo_k > hi_k:
+        if max_clips is not None:
+            return [5] * max_clips
+        return list(DEFAULT_CLIP_DURATIONS)
+    k = rng.randint(lo_k, hi_k)
+    counts = [3] * k
+    extras = rep - 3 * k
+    for _ in range(extras):
+        cand = [i for i in range(k) if counts[i] < 5]
+        counts[rng.choice(cand)] += 1
+    rng.shuffle(counts)
+    return counts
 
 
 class SchizoVideoGenerator:
@@ -252,7 +318,9 @@ class SchizoVideoGenerator:
     def generate_images(self):
         import fal_client, requests, io
         os.makedirs(self.images_dir, exist_ok=True)
-        for i, p in enumerate(self.image_prompts):
+        n = min(len(self.image_prompts), len(self.clip_durations))
+        for i in range(n):
+            p = self.image_prompts[i]
             out = os.path.join(self.images_dir, f"img_{i:02d}.webp")
             if os.path.exists(out) and os.path.getsize(out) > 10000: continue
             print(f"  [{i}] Generating...")
@@ -284,8 +352,9 @@ class SchizoVideoGenerator:
     
     def build_base(self):
         print("\n--- Building base video ---")
-        clips = sorted(os.path.join(self.clips_dir, f) for f in os.listdir(self.clips_dir)
-                       if f.startswith("clip_") and f.endswith(".mp4"))
+        n = min(len(self.image_prompts), len(self.clip_durations))
+        clips = [os.path.join(self.clips_dir, f"clip_{i:02d}.mp4") for i in range(n)]
+        clips = [c for c in clips if os.path.exists(c)]
         durs = [self._probe(c) for c in clips]
         print(f"  {len(clips)} clips, {sum(durs):.1f}s")
         # wan/v2.7 emits clips at their requested duration — no trimming needed.
@@ -312,6 +381,7 @@ class SchizoVideoGenerator:
     def generate(self):
         print("=== Schizo Video Generator ===")
         print(f"Vibe: {self.vibe}")
+        print(f"Clip durations ({len(self.clip_durations)} clips, {sum(self.clip_durations)}s): {self.clip_durations}")
         os.makedirs(self.dir, exist_ok=True)
         
         # Phase 1: Media
@@ -390,8 +460,29 @@ def main():
     parser.add_argument("--clips-dir")
     parser.add_argument("--base-only", action="store_true")
     parser.add_argument("--no-music", action="store_true")
+    parser.add_argument(
+        "--target-seconds",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Approximate final length: random integer 3–5s per clip, summed to match a feasible total near N",
+    )
+    parser.add_argument(
+        "--clip-seed",
+        type=int,
+        default=None,
+        help="RNG seed for --target-seconds clip counts/ordering (default: nondeterministic)",
+    )
     args = parser.parse_args()
-    
+
+    clip_durations = None
+    if args.target_seconds is not None:
+        clip_durations = random_clip_lengths_for_target(
+            args.target_seconds,
+            seed=args.clip_seed,
+            max_clips=len(DEFAULT_IMAGE_PROMPTS),
+        )
+
     gen = SchizoVideoGenerator(
         vibe_prompt=args.prompt,
         output_dir=args.output_dir,
@@ -399,6 +490,7 @@ def main():
         music_file=args.music_file,
         clips_dir=args.clips_dir,
         no_music=args.no_music,
+        clip_durations=clip_durations,
     )
     gen.generate()
 
